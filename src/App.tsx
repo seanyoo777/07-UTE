@@ -1,4 +1,6 @@
-import { Suspense, lazy } from 'react'
+import { Suspense, lazy, useEffect } from 'react'
+import { UnifiedAdminDashboard } from './admin'
+import { useAppNavigation } from './appNavigation'
 import { ErrorBoundary } from './components/common/ErrorBoundary'
 import type { MarketId } from './markets/types'
 import { HtsTopBar } from './shell/HtsTopBar'
@@ -57,9 +59,37 @@ function AppFallback() {
  *  - 본문: 활성 시장 View
  */
 export default function App() {
+  const view = useAppNavigation((s) => s.view)
+  const syncFromWindow = useAppNavigation((s) => s.syncFromWindow)
   const activeMarketId = useTradingStore((s) => s.activeMarketId)
   const setActiveMarket = useTradingStore((s) => s.setActiveMarket)
   const status = useTradingStore((s) => s.boards[activeMarketId].status)
+
+  useEffect(() => {
+    syncFromWindow()
+  }, [syncFromWindow])
+
+  useEffect(() => {
+    const onPop = () => syncFromWindow()
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [syncFromWindow])
+
+  if (view === 'admin') {
+    return (
+      <ErrorBoundary
+        fallback={
+          <div className="flex min-h-screen items-center justify-center bg-so-bg p-6 text-red-300">
+            관리자 화면 오류. 콘솔을 확인하세요.
+          </div>
+        }
+      >
+        <div className="flex min-h-screen min-h-[100dvh] flex-col">
+          <UnifiedAdminDashboard />
+        </div>
+      </ErrorBoundary>
+    )
+  }
 
   return (
     <ErrorBoundary

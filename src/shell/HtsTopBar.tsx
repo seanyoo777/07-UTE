@@ -1,5 +1,8 @@
+import { useAppNavigation } from '../appNavigation'
+import { BridgeIntegrationPanel } from '../components/bridge/BridgeIntegrationPanel'
 import { getCategoryConfig } from '../config/categoryConfig'
 import { MOCK_USD_KRW_RATE } from '../core/fx/mockUsdKrw'
+import { selectBridgeSummaryText, useBridgeDashboardStore } from '../bridges'
 import type { MarketId } from '../markets/types'
 import type { AdapterStatus } from '../store/types'
 import { MarketStateBadge } from '../components/status/MarketStateBadge'
@@ -32,12 +35,19 @@ const STATUS_LABEL: Record<AdapterStatus, string> = {
  *
  * 좌: UTX 로고 + 활성 카테고리 배지
  * 중: OneAI 신호 + 뉴스 티커
- * 우: 시스템트레이딩 / 시장 세션 / 어댑터 연결 / 사용자 상태
+ * 우: 시스템트레이딩 / 시장 세션 / 어댑터 연결 / Bridge(BRG) / 사용자 상태
  */
 export function HtsTopBar({ marketId, status }: Props) {
   const config = getCategoryConfig(marketId)
+  const goAdmin = useAppNavigation((s) => s.goAdmin)
+  const toggleBridgePanel = useBridgeDashboardStore((s) => s.togglePanel)
+  const bridgePanelOpen = useBridgeDashboardStore((s) => s.panelOpen)
+  const bridgeSnapshots = useBridgeDashboardStore((s) => s.snapshots)
+  const bridgeSummary = selectBridgeSummaryText(bridgeSnapshots)
+
   return (
-    <header className="relative flex shrink-0 items-center gap-2 border-b border-so-border bg-gradient-to-b from-so-surface-2 via-so-surface to-so-surface px-2 py-1.5 backdrop-blur-md lg:px-3 lg:py-2">
+    <>
+      <header className="relative flex shrink-0 items-center gap-2 border-b border-so-border bg-gradient-to-b from-so-surface-2 via-so-surface to-so-surface px-2 py-1.5 backdrop-blur-md lg:px-3 lg:py-2">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-so-accent/30 to-transparent" />
 
       <div className="flex shrink-0 items-center gap-2">
@@ -83,8 +93,29 @@ export function HtsTopBar({ marketId, status }: Props) {
         >
           {STATUS_LABEL[status]}
         </span>
+        <button
+          type="button"
+          onClick={() => goAdmin()}
+          className="inline-flex shrink-0 rounded-md border border-so-border bg-so-bg/50 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-so-muted hover:border-so-accent/40 hover:text-so-accent"
+          title="통합 관리자 대시보드 (mock · 읽기 전용 · /admin)"
+        >
+          ADM
+        </button>
+        <button
+          type="button"
+          onClick={() => toggleBridgePanel()}
+          aria-expanded={bridgePanelOpen}
+          className={`inline-flex shrink-0 rounded-md border px-2 py-1 text-[10px] font-semibold uppercase tracking-wider ${
+            bridgePanelOpen ? 'border-so-accent/60 bg-so-accent/15 text-so-accent' : 'border-so-border bg-so-bg/50 text-so-muted'
+          }`}
+          title={`외부 Bridge 통합 (mock 전용) — ${bridgeSummary}`}
+        >
+          BRG
+        </button>
         <UserStatusBadge />
       </div>
     </header>
+      <BridgeIntegrationPanel />
+    </>
   )
 }
