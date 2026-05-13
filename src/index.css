@@ -1,0 +1,100 @@
+@import 'tailwindcss';
+
+/**
+ * UTX 2026 다크 HTS 디자인 토큰.
+ *
+ * - 베이스: 거의 검정에 가까운 zinc 톤
+ * - 표면: 미세한 elevation 차이 (bg → surface → surface-2)
+ * - 액센트: 블루(기본) + 매수/매도(bid/ask) 의 한국 컬러 컨벤션 (long=green, short=red)
+ * - 모든 가격/숫자는 tabular-nums 으로 자릿수 정렬
+ */
+@theme {
+  --font-sans: 'Pretendard Variable', Pretendard, system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, SFMono-Regular, monospace;
+
+  /* 화이트라벨 가능한 의미 단위 토큰 (so- 프리픽스: shared / universal) */
+  --color-so-bg: #0a0d11;
+  --color-so-surface: #11161d;
+  --color-so-surface-2: #161c25;
+  --color-so-border: #1d2330;
+  --color-so-border-2: #2b3243;
+  --color-so-text: #eef0f4;
+  --color-so-muted: #828b9c;
+  --color-so-bid: #0ecb81;
+  --color-so-ask: #f6465d;
+  --color-so-accent: #4f87ff;
+  --color-so-accent-2: #8b5cf6;
+  --color-so-warn: #f59e0b;
+
+  /* 2026 HTS — 글래스/그라디언트 합성용 */
+  --so-glass-blur: 14px;
+  --so-glow-accent: 0 0 18px rgba(79, 135, 255, 0.18);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  /* 라디얼 그라디언트로 배경에 미세한 광원 */
+  background:
+    radial-gradient(60% 40% at 15% 0%, rgba(79, 135, 255, 0.06) 0%, transparent 60%),
+    radial-gradient(50% 35% at 100% 0%, rgba(139, 92, 246, 0.05) 0%, transparent 60%),
+    var(--color-so-bg);
+  color: var(--color-so-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: 'ss01', 'cv11';
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* 가격·수량은 항상 자릿수 정렬 */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* 스크롤바 — 2026 HTS 톤 */
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--color-so-border-2);
+  border-radius: 999px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--color-so-muted);
+}
+
+/* 패널 상단 광택 (글래스) — 클래스로 opt-in */
+.so-panel-glow::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(79, 135, 255, 0.25),
+    rgba(139, 92, 246, 0.18),
+    transparent
+  );
+  pointer-events: none;
+}
+
+/* 모바일 safe-area */
+@supports (padding: env(safe-area-inset-bottom)) {
+  body {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}

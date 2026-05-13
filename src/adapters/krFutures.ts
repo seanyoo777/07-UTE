@@ -1,0 +1,56 @@
+import { createMockAdapter } from '../core/adapters/createMockAdapter'
+import { mergeSymbolSpec, type SymbolSpec } from '../core/symbols/SymbolSpec'
+
+const symbols: SymbolSpec[] = [
+  mergeSymbolSpec({
+    symbol: 'KOSPI200',
+    displayName: '코스피200 선물',
+    marketId: 'kr-futures',
+    assetClass: 'futures',
+    quoteCurrency: 'KRW',
+    marginCurrency: 'KRW',
+    tickSize: 0.05,
+    lotSize: 1,
+    contractSize: 1,
+    tickValue: 12_500,
+    priceDecimals: 2,
+    qtyDecimals: 0,
+    defaultLeverage: 10,
+    minQty: 1,
+    maxQty: 5_000,
+    sessionType: 'futures_session',
+    pnlFormulaType: 'futures_contract',
+    referencePrice: 358.45,
+    tvSymbol: 'KRX:201',
+  }),
+  mergeSymbolSpec({
+    symbol: 'KOSDAQ150',
+    displayName: '코스닥150 선물',
+    marketId: 'kr-futures',
+    assetClass: 'futures',
+    quoteCurrency: 'KRW',
+    marginCurrency: 'KRW',
+    tickSize: 0.05,
+    lotSize: 1,
+    contractSize: 1,
+    tickValue: 10_000,
+    priceDecimals: 2,
+    qtyDecimals: 0,
+    defaultLeverage: 10,
+    minQty: 1,
+    maxQty: 5_000,
+    sessionType: 'futures_session',
+    pnlFormulaType: 'futures_contract',
+    referencePrice: 1342.6,
+    tvSymbol: 'KRX:106',
+  }),
+]
+
+export const krFuturesMockAdapter = createMockAdapter({
+  id: 'kr-futures-mock',
+  marketId: 'kr-futures',
+  displayName: '국내선물 (Mock)',
+  symbols,
+  tickIntervalMs: 700,
+  tick: { sigmaRatio: 0.0011, depth: 12 },
+})
