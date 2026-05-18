@@ -155,6 +155,13 @@ export function shouldEnableWhitelabelAdminConfig(
   return flags.chrome.enableWhitelabelPresets && flags.chrome.enableWhitelabelAdminConfig
 }
 
+/** Trading window presets on UniversalMarketView. */
+export function shouldEnableTradingWindowPresets(
+  flags: Pick<EffectiveLayoutFlags, 'chrome'>,
+): boolean {
+  return flags.chrome.enableWhitelabelPresets && flags.chrome.enableTradingWindowPresets
+}
+
 /** 주문 패널 UI 입력·제출 비활성 (store/submitOrder 미변경). */
 export function isOrderPanelReadOnly(flags: Pick<EffectiveLayoutFlags, 'readOnly'>): boolean {
   return flags.readOnly

@@ -99,3 +99,7 @@ Emergency profile disables both.
 1. Add `TenantWhitelabelPreset` object to `MOCK_TENANT_PRESETS` (built-in).
 2. Or use **Tenant Admin Config Console** to clone/edit custom tenants (still registry merge, no code fork).
 3. Remote preset JSON can replace registry behind a feature flag; keep `validateTenantPreset` as gate.
+
+## Trading window presets (Phase 0 design)
+
+Per-tenant **trading workspace** skins (order book, chart chrome, dock, order ticket, mobile stack) — same engine, different HTS face. See **`docs/UTE_TRADING_WINDOW_PRESETS.md`** (design only; implementation Phases 1–5).

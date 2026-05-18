@@ -1,3 +1,4 @@
+import { validateTradingWindowPreset } from '../tradingWindow/validateTradingWindowPreset'
 import {
   TENANT_ADMIN_PRESET_IDS,
   TENANT_MENU_PRESET_IDS,
@@ -31,5 +32,7 @@ export function validateTenantPreset(preset: TenantWhitelabelPreset): {
   if (preset.theme.typography.baseSizePx < 10 || preset.theme.typography.baseSizePx > 20) {
     return { ok: false, message: 'typography.baseSizePx out of range' }
   }
+  const tw = validateTradingWindowPreset(preset.tradingWindow)
+  if (!tw.ok) return tw
   return { ok: true, message: 'tenant preset valid' }
 }

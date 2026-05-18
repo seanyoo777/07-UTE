@@ -44,6 +44,8 @@ export type UteLayoutChromeFlags = {
   enableWhitelabelPreviewCenter: boolean
   /** Tenant Admin Config Console on /admin (mock CRUD + visual editor). */
   enableWhitelabelAdminConfig: boolean
+  /** Trading window presets on UniversalMarketView (mock UI tokens). */
+  enableTradingWindowPresets: boolean
 }
 
 export type UteLayoutIntegrationFlags = {
@@ -92,6 +94,7 @@ export const DEFAULT_LAYOUT_FLAGS: UteLayoutFeatureFlags = {
     enableWhitelabelThemeSwitcher: true,
     enableWhitelabelPreviewCenter: true,
     enableWhitelabelAdminConfig: true,
+    enableTradingWindowPresets: true,
   },
   integrations: {
     oneAi: true,
@@ -133,6 +136,7 @@ export const EMERGENCY_LAYOUT_PROFILE: Pick<
     enableWhitelabelThemeSwitcher: false,
     enableWhitelabelPreviewCenter: false,
     enableWhitelabelAdminConfig: false,
+    enableTradingWindowPresets: false,
   },
   integrations: {
     oneAi: false,
@@ -171,6 +175,7 @@ export type LayoutFlagsEnvRecord = {
   VITE_UTE_ENABLE_WHITELABEL_THEME_SWITCHER?: string
   VITE_UTE_ENABLE_WHITELABEL_PREVIEW_CENTER?: string
   VITE_UTE_ENABLE_WHITELABEL_ADMIN_CONFIG?: string
+  VITE_UTE_ENABLE_TRADING_WINDOW_PRESETS?: string
   VITE_UTE_TENANT_VALIDATION_MOCK_VERDICT?: string
   VITE_UTE_TENANT_VALIDATION_MOCK_FAIL?: string
   VITE_UTE_ONEAI_CHROME?: string
@@ -244,6 +249,7 @@ function readLayoutFlagsFromViteEnv(): LayoutFlagsEnvRecord {
     VITE_UTE_ENABLE_WHITELABEL_THEME_SWITCHER: e.VITE_UTE_ENABLE_WHITELABEL_THEME_SWITCHER,
     VITE_UTE_ENABLE_WHITELABEL_PREVIEW_CENTER: e.VITE_UTE_ENABLE_WHITELABEL_PREVIEW_CENTER,
     VITE_UTE_ENABLE_WHITELABEL_ADMIN_CONFIG: e.VITE_UTE_ENABLE_WHITELABEL_ADMIN_CONFIG,
+    VITE_UTE_ENABLE_TRADING_WINDOW_PRESETS: e.VITE_UTE_ENABLE_TRADING_WINDOW_PRESETS,
     VITE_UTE_TENANT_VALIDATION_MOCK_VERDICT: e.VITE_UTE_TENANT_VALIDATION_MOCK_VERDICT,
     VITE_UTE_TENANT_VALIDATION_MOCK_FAIL: e.VITE_UTE_TENANT_VALIDATION_MOCK_FAIL,
     VITE_UTE_ONEAI_CHROME: e.VITE_UTE_ONEAI_CHROME,
@@ -337,6 +343,10 @@ function applyEnvRecord(
   const pWhitelabelAdmin = parseEnvBoolean(env.VITE_UTE_ENABLE_WHITELABEL_ADMIN_CONFIG)
   if (pWhitelabelAdmin !== undefined) {
     chromePatches.enableWhitelabelAdminConfig = pWhitelabelAdmin
+  }
+  const pTradingWindow = parseEnvBoolean(env.VITE_UTE_ENABLE_TRADING_WINDOW_PRESETS)
+  if (pTradingWindow !== undefined) {
+    chromePatches.enableTradingWindowPresets = pTradingWindow
   }
 
   if (Object.keys(chromePatches).length > 0) {

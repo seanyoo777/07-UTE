@@ -1,4 +1,7 @@
-import type { TenantWhitelabelPreset } from './tenantPresetTypes'
+import {
+  attachTradingWindowToPreset,
+  type TenantWhitelabelPresetWithoutTradingWindow,
+} from '../tradingWindow/tradingWindowPresetRegistry'
 import { WHITELABEL_SCHEMA_VERSION } from './tenantPresetTypes'
 
 const baseTypography = {
@@ -8,7 +11,7 @@ const baseTypography = {
   headingWeight: 600,
 } as const
 
-export const MOCK_TENANT_PRESETS: TenantWhitelabelPreset[] = [
+const MOCK_TENANT_PRESETS_BASE: TenantWhitelabelPresetWithoutTradingWindow[] = [
   {
     schemaVersion: WHITELABEL_SCHEMA_VERSION,
     id: 'goldx',
@@ -115,3 +118,5 @@ export const MOCK_TENANT_PRESETS: TenantWhitelabelPreset[] = [
     admin: 'modern-glass',
   },
 ]
+
+export const MOCK_TENANT_PRESETS = MOCK_TENANT_PRESETS_BASE.map(attachTradingWindowToPreset)

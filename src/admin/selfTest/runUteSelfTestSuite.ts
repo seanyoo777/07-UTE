@@ -47,6 +47,12 @@ import {
   validateWhitelabelTenantSwitchPersistence,
   validateWhitelabelThemePersistence,
 } from '../../whitelabel/whitelabelSelfTest'
+import {
+  validateTradingWindowInvalidFallback,
+  validateTradingWindowNoApiNoWebsocket,
+  validateTradingWindowPresetResolver,
+  validateTradingWindowPresetSchema,
+} from '../../tradingWindow/tradingWindowSelfTest'
 
 export type RunUteSelfTestInput = {
   /** Bridge dashboard error count from last mock probe (optional). */
@@ -615,6 +621,42 @@ export function runUteSelfTestSuite(input: RunUteSelfTestInput = {}): SelfTestRe
     label: 'Menu/layout differentiation without API / WebSocket',
     verdict: 'PASS',
     detail: 'Nav mapping + layout tokens only; no polling',
+  })
+
+  const twSchema = validateTradingWindowPresetSchema()
+  push(checks, {
+    id: 'trading-window-preset-schema',
+    category: 'layout',
+    label: 'Trading window preset schema (mock tenants)',
+    verdict: twSchema.ok ? 'PASS' : 'FAIL',
+    detail: twSchema.message,
+  })
+
+  const twResolver = validateTradingWindowPresetResolver()
+  push(checks, {
+    id: 'trading-window-preset-resolver',
+    category: 'layout',
+    label: 'Trading window bundle resolver',
+    verdict: twResolver.ok ? 'PASS' : 'FAIL',
+    detail: twResolver.message,
+  })
+
+  const twFallback = validateTradingWindowInvalidFallback()
+  push(checks, {
+    id: 'trading-window-invalid-fallback',
+    category: 'layout',
+    label: 'Invalid trading window preset fallback',
+    verdict: twFallback.ok ? 'PASS' : 'FAIL',
+    detail: twFallback.message,
+  })
+
+  const twNoNetwork = validateTradingWindowNoApiNoWebsocket()
+  push(checks, {
+    id: 'trading-window-no-api-no-websocket',
+    category: 'smoke',
+    label: 'Trading window presets without API / WebSocket',
+    verdict: twNoNetwork.ok ? 'PASS' : 'FAIL',
+    detail: twNoNetwork.message,
   })
 
   const customSchema = validateCustomTenantSchema()

@@ -87,6 +87,7 @@ UTE separates **(A) on-screen trading** via `BrokerAdapter` from **(B) optional 
 - `docs/UTE_RISK_GRAPH.md` — Cross-App Risk Graph mock (PHASE39).  
 - `docs/UTE_OPERATIONS_TIMELINE.md` — Global Operations Timeline mock (PHASE40).  
 - `docs/UTE_WHITELABEL_THEME.md` — White-label theme preset engine (mock tenants, localStorage switcher).  
+- `docs/UTE_TRADING_WINDOW_PRESETS.md` — Trading window preset design (Phase 0 — chart/book/order/dock skins per tenant).  
 - `docs/UTE_UNIFIED_EVENT_FEED.md` — Unified Event Feed (mock sources, localStorage max 10, feature flag).  
 - `docs/UTE_WORKSPACE_CONTEXT_ROUTER.md` — Workspace context router (feed → panel highlight, tenant scope).  
 - `docs/UTE_TENANT_CONTEXT_BRIDGE.md` — 12-TGX-TokenAdmin validation bridge (read-only, scope mismatch).  

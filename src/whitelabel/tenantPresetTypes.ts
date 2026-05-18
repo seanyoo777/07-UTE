@@ -1,5 +1,7 @@
 /** White-label preset schema — single engine, many brand faces (mock only). */
 
+import type { TradingWindowPreset } from '../tradingWindow/tradingWindowPresetTypes'
+
 export const WHITELABEL_SCHEMA_VERSION = '1.0.0' as const
 
 export const TENANT_MENU_PRESET_IDS = [
@@ -66,5 +68,6 @@ export type TenantWhitelabelPreset = {
   layout: TenantLayoutPreset
   menu: TenantMenuPresetId
   admin: TenantAdminPresetId
+  tradingWindow: TradingWindowPreset
   mockOnly: true
 }

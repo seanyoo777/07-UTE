@@ -19,6 +19,7 @@ import { usePlatformDiagnosticsScope } from './usePlatformDiagnosticsScope'
 import { DiagnosticsTenantValidationSection } from './tenantContext/DiagnosticsTenantValidationSection'
 import { buildUteDiagnosticsPanelViewModel } from './diagnostics/diagnosticsUiAdapter'
 import { DiagnosticsUiRowsList } from './diagnostics/DiagnosticsUiRowsList'
+import { TradingWindowDiagnosticsSection } from '../tradingWindow/TradingWindowDiagnosticsSection'
 import { WhitelabelDiagnosticsSection } from '../whitelabel/WhitelabelDiagnosticsSection'
 
 type Props = {
@@ -122,6 +123,8 @@ export function PlatformDiagnosticsPanel({ onClose }: Props) {
         <DiagnosticsTenantValidationSection />
 
         <WhitelabelDiagnosticsSection />
+
+        <TradingWindowDiagnosticsSection />
 
         <div
           className="rounded-md border border-so-border/50 bg-so-bg/60 p-2"

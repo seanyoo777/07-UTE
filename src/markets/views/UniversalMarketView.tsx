@@ -23,6 +23,9 @@ import { useMarketSubscription } from '../../hooks/useMarketSubscription'
 import { HtsLayout } from '../../layouts/HtsLayout'
 import { TradingLayout } from '../../layouts/TradingLayout'
 import { useTradingStore } from '../../store/tradingStore'
+import type { TradingWindowBundle } from '../../tradingWindow/tradingWindowPresetTypes'
+import { useTradingWindowBundle } from '../../tradingWindow/useTradingWindowBundle'
+import { useTenantWhitelabelStore } from '../../whitelabel/tenantWhitelabelStore'
 import type { MarketId } from '../types'
 
 type Props = {
@@ -39,6 +42,16 @@ type SlotWrapProps = {
   state?: 'planned' | 'in-progress'
   note?: string
   children: React.ReactNode
+}
+
+function twpWorkspaceProps(bundle: TradingWindowBundle | null): {
+  className?: string
+} & Record<string, string | undefined> {
+  if (!bundle) return {}
+  return {
+    className: bundle.classNames.workspace,
+    ...bundle.dataAttributes,
+  }
 }
 
 function SlotWrap({ showBadge, source, module, state, note, children }: SlotWrapProps) {
@@ -60,8 +73,15 @@ function SlotWrap({ showBadge, source, module, state, note, children }: SlotWrap
 export function UniversalMarketView({ marketId, onMarketChange, mobileHeaderSlot }: Props) {
   useMarketSubscription(marketId)
 
+  const tenantPreset = useTenantWhitelabelStore((s) => s.preset)
+  const twBundle = useTradingWindowBundle(tenantPreset)
   const layoutFlags = useEffectiveLayoutFlags()
   const bannerCopy = useMemo(() => getLayoutModeBannerCopy(layoutFlags), [layoutFlags])
+  const rawSpeedState = twBundle?.preset.speedOrder.integrationState ?? 'planned'
+  const speedState: 'planned' | 'in-progress' =
+    rawSpeedState === 'integrated' ? 'in-progress' : rawSpeedState
+  const slotModule = (key: keyof TradingWindowBundle['preset']['speedOrder']['moduleLabels'], fallback: string) =>
+    twBundle?.preset.speedOrder.moduleLabels[key] ?? fallback
   const showSpeedOrderSlot = shouldShowIntegrationSlot(layoutFlags, 'speedOrderChrome')
   const showChromeSidebar = shouldShowChromeSidebar(layoutFlags)
   const showBottomDock = shouldShowBottomDock(layoutFlags)
@@ -95,7 +115,10 @@ export function UniversalMarketView({ marketId, onMarketChange, mobileHeaderSlot
 
   return (
     <>
-      <div className="hidden h-full min-h-0 lg:flex lg:flex-col">
+      <div
+        className={`hidden h-full min-h-0 lg:flex lg:flex-col ${twBundle?.classNames.workspace ?? ''}`}
+        {...twpWorkspaceProps(twBundle)}
+      >
         <LayoutModeBanner copy={bannerCopy} />
         <div className="min-h-0 flex-1">
           <HtsLayout
@@ -112,8 +135,8 @@ export function UniversalMarketView({ marketId, onMarketChange, mobileHeaderSlot
               <SlotWrap
                 showBadge={showSpeedOrderSlot}
                 source="05-SpeedOrder"
-                module="ChartArea + DOM"
-                state="in-progress"
+                module={slotModule('chart', 'ChartArea + DOM')}
+                state={speedState}
                 note="TradingView 위젯 임시 사용 — 5번 차트 모듈로 교체 예정"
               >
                 <TradingViewChart spec={activeSpec} lastPrice={board.lastPrice} changePct={changePct} />
@@ -123,8 +146,8 @@ export function UniversalMarketView({ marketId, onMarketChange, mobileHeaderSlot
               <SlotWrap
                 showBadge={showSpeedOrderSlot}
                 source="05-SpeedOrder"
-                module="OrderBookPanel (HTS)"
-                state="planned"
+                module={slotModule('orderBook', 'OrderBookPanel (HTS)')}
+                state={speedState}
                 note="현재 mock 호가. 5번 HTS 호가창으로 교체 예정"
               >
                 <OrderBookPanel book={board.orderBook} spec={activeSpec} lastPrice={board.lastPrice} />
@@ -134,8 +157,8 @@ export function UniversalMarketView({ marketId, onMarketChange, mobileHeaderSlot
               <SlotWrap
                 showBadge={showSpeedOrderSlot}
                 source="05-SpeedOrder"
-                module="SpeedOrderPanel + StopMit"
-                state="planned"
+                module={slotModule('orderPanel', 'SpeedOrderPanel + StopMit')}
+                state={speedState}
                 note="현재 카테고리 config 기반 mock. 5번 거래 엔진 통합 예정"
               >
                 {orderPanel}
@@ -146,8 +169,8 @@ export function UniversalMarketView({ marketId, onMarketChange, mobileHeaderSlot
                 <SlotWrap
                   showBadge={showSpeedOrderSlot}
                   source="05-SpeedOrder"
-                  module="PositionPanel + TradeHistoryPanel"
-                  state="planned"
+                  module={slotModule('dock', 'PositionPanel + TradeHistoryPanel')}
+                  state={speedState}
                   note="포지션·체결 표는 5번 패널로 교체 예정"
                 >
                   <BottomDock
@@ -166,7 +189,11 @@ export function UniversalMarketView({ marketId, onMarketChange, mobileHeaderSlot
         </div>
       </div>
 
-      <div className="flex h-full min-h-0 flex-col lg:hidden">
+      <div
+        className={`flex h-full min-h-0 flex-col lg:hidden ${twBundle?.classNames.workspace ?? ''}`}
+        {...twpWorkspaceProps(twBundle)}
+        data-ute-twp-viewport="mobile"
+      >
         <LayoutModeBanner copy={bannerCopy} />
         {mobileHeaderSlot ? (
           <div className="shrink-0 border-b border-so-border bg-so-surface px-3 py-1.5">
