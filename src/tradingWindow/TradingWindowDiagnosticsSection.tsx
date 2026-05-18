@@ -1,6 +1,7 @@
 import { shouldEnableTradingWindowPresets } from '../config/layoutUiGuards'
 import { useEffectiveLayoutFlags } from '../hooks/useEffectiveLayoutFlags'
 import { useTenantWhitelabelStore } from '../whitelabel/tenantWhitelabelStore'
+import { useMarketContextStore } from './market/marketContextStore'
 import { buildTradingWindowOverrideDiagnostics } from './override/tradingWindowOverrideDiagnostics'
 import { useTradingWindowOverrideStore } from './override/tradingWindowOverrideStore'
 import { resolveTradingWindowBundle } from './resolveTradingWindowBundle'
@@ -12,10 +13,14 @@ export function TradingWindowDiagnosticsSection() {
   const layoutFlags = useEffectiveLayoutFlags()
   const preset = useTenantWhitelabelStore((s) => s.preset)
   const revision = useTradingWindowOverrideStore((s) => s.revision)
+  const marketRevision = useMarketContextStore((s) => s.revision)
   if (!shouldEnableTradingWindowPresets(layoutFlags)) return null
 
   void revision
-  const bundle = resolveTradingWindowBundle(preset)
+  void marketRevision
+  const bundle = resolveTradingWindowBundle(preset, {
+    marketContextId: useMarketContextStore.getState().previewContextId ?? undefined,
+  })
   const overrideDiag = buildTradingWindowOverrideDiagnostics(preset)
   const tw = bundle.preset
   const valid = validateTradingWindowPreset(tw)
@@ -43,8 +48,13 @@ export function TradingWindowDiagnosticsSection() {
         mobile stack <span className="font-mono text-so-fg">{tw.mobile.stackOrder.join(' → ')}</span>
       </p>
       <p className="text-so-muted">valid={valid.ok ? 'yes' : 'no'} · mockOnly</p>
+      <p className="text-so-muted" data-testid="trading-window-market-diagnostics">
+        market={overrideDiag.activeMarketContext} · style={overrideDiag.marketUiStyleLabel} · chart=
+        {overrideDiag.chartEmphasis} · dom={overrideDiag.domEmphasis} · book=
+        {overrideDiag.orderBookEmphasis}
+      </p>
       <p className="text-so-muted" data-testid="trading-window-override-diagnostics">
-        overrides={overrideDiag.activeOverrideCount} · source={overrideDiag.mergeSource} · drift=
+        overrides={overrideDiag.activeOverrideCount} · merge={overrideDiag.mergeSource} · drift=
         {overrideDiag.presetDrift ? 'yes' : 'no'} · draft=
         {overrideDiag.previewDraftActive ? 'yes' : 'no'} · mobile=
         {overrideDiag.mobileVisualPreset} · import/export ready

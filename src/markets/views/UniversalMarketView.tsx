@@ -81,7 +81,7 @@ export function UniversalMarketView({ marketId, onMarketChange, mobileHeaderSlot
   useMarketSubscription(marketId)
 
   const tenantPreset = useTenantWhitelabelStore((s) => s.preset)
-  const twBundle = useTradingWindowBundle(tenantPreset)
+  const twBundle = useTradingWindowBundle(tenantPreset, marketId)
   const layoutFlags = useEffectiveLayoutFlags()
   const bannerCopy = useMemo(() => getLayoutModeBannerCopy(layoutFlags), [layoutFlags])
   const rawSpeedState = twBundle?.preset.speedOrder.integrationState ?? 'planned'

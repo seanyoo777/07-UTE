@@ -8,6 +8,7 @@ import {
   exportOverridesJson,
   parseOverridesImport,
 } from './override/tradingWindowOverrideImportExport'
+import { useMarketContextStore } from './market/marketContextStore'
 import { resolveEffectiveOverride } from './override/resolveTradingWindowMerge'
 import { useTradingWindowOverrideStore } from './override/tradingWindowOverrideStore'
 import { resolveTradingWindowBundle } from './resolveTradingWindowBundle'
@@ -37,6 +38,7 @@ export function validateTradingWindowOverrideImportExport(): { ok: boolean; mess
 
 export function validateTradingWindowMergePriority(): { ok: boolean; message: string } {
   useTradingWindowOverrideStore.setState({ overrides: {}, preview: null, revision: 0 })
+  useMarketContextStore.setState({ previewContextId: null, revision: 0 })
   const tenant = resolveWhitelabelPreset('bluetrade')
   const base = resolveTradingWindowBundle(tenant)
   const savedForm = adminFormFromTenantId('bluetrade', null)

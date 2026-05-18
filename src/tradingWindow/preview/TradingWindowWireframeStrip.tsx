@@ -1,4 +1,5 @@
 import type { TenantWhitelabelPreset } from '../../whitelabel/tenantPresetTypes'
+import { useMarketContextStore } from '../market/marketContextStore'
 import { useTradingWindowOverrideStore } from '../override/tradingWindowOverrideStore'
 import { resolveTradingWindowBundle } from '../resolveTradingWindowBundle'
 import { slotLabel } from '../mobile/mobileStackWireframe'
@@ -13,8 +14,14 @@ type Props = {
 
 export function TradingWindowWireframeStrip({ preset }: Props) {
   const revision = useTradingWindowOverrideStore((s) => s.revision)
+  const marketRevision = useMarketContextStore((s) => s.revision)
+  const previewContextId = useMarketContextStore((s) => s.previewContextId)
   void revision
-  const bundle = resolveTradingWindowBundle(preset)
+  void marketRevision
+  const bundle = resolveTradingWindowBundle(
+    preset,
+    previewContextId ? { marketContextId: previewContextId } : undefined,
+  )
   const hts = buildHtsWireframeModel(bundle.htsGrid, {
     dockOpen: true,
     orderBookEmphasis: bundle.preset.orderBook.density === 'compact',
@@ -32,7 +39,8 @@ export function TradingWindowWireframeStrip({ preset }: Props) {
     >
       <p className="text-[10px] font-semibold text-so-fg">Trading wireframes (mock)</p>
       <p className="mt-0.5 font-mono text-[9px] text-so-muted">
-        merge={bundle.dataAttributes['data-ute-twp-override'] ?? 'none'} · mobile{' '}
+        merge={bundle.dataAttributes['data-ute-twp-merge-source'] ?? 'none'} · market=
+        {bundle.dataAttributes['data-ute-twp-market-context'] ?? 'none'} · mobile{' '}
         {bundle.preset.mobile.stackOrder.join('→')}
       </p>
 

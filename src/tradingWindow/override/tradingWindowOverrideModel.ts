@@ -10,7 +10,11 @@ import {
   type OrderBookDensityChrome,
   type OrderFormChromeMode,
 } from '../tradingWindowPanelChrome'
-import type { TradingWindowPreset, TradingWindowProfileId } from '../tradingWindowPresetTypes'
+import type {
+  TradingWindowHtsGrid,
+  TradingWindowPreset,
+  TradingWindowProfileId,
+} from '../tradingWindowPresetTypes'
 import { clampHtsGridWeight, getHtsGridForProfile } from '../tradingWindowHtsGridDefaults'
 import type {
   MobileStackMode,
@@ -168,14 +172,15 @@ function applyDockChrome(
 export function applyTradingWindowTenantOverride(
   tenantPreset: TenantWhitelabelPreset,
   override: TradingWindowTenantOverride | null | undefined,
+  base?: { preset: TradingWindowPreset; htsGrid: TradingWindowHtsGrid },
 ): {
   preset: TradingWindowPreset
   htsGrid: TradingWindowTenantOverride['htsGrid']
   hasOverride: boolean
   driftFromBuiltin: boolean
 } {
-  const builtinPreset = resolveTradingWindowPreset(tenantPreset)
-  const builtinGrid = getHtsGridForProfile(builtinPreset.profileId)
+  const builtinPreset = base?.preset ?? resolveTradingWindowPreset(tenantPreset)
+  const builtinGrid = base?.htsGrid ?? getHtsGridForProfile(builtinPreset.profileId)
   if (!override || override.tenantPresetId !== tenantPreset.id) {
     return {
       preset: builtinPreset,

@@ -4,6 +4,8 @@ import { useEffectiveLayoutFlags } from '../../hooks/useEffectiveLayoutFlags'
 import { PlatformMockOnlyBadge } from '../../platform/PlatformMockOnlyBadge'
 import { TradingWindowHtsGridPreview } from '../../tradingWindow/preview/TradingWindowHtsGridPreview'
 import { TradingWindowPanelChromePreview } from '../../tradingWindow/preview/TradingWindowPanelChromePreview'
+import { TradingWindowMarketContextSelector } from '../../tradingWindow/market/TradingWindowMarketContextSelector'
+import { TradingWindowMarketWireframeStrip } from '../../tradingWindow/preview/TradingWindowMarketWireframeStrip'
 import { TradingWindowWireframeStrip } from '../../tradingWindow/preview/TradingWindowWireframeStrip'
 import { useTenantWhitelabelStore } from '../tenantWhitelabelStore'
 import { AdminSkinPreview } from './AdminSkinPreview'
@@ -114,6 +116,8 @@ export function TenantPreviewCenter() {
       <LayoutPreviewStrip layout={bundle.layoutPreview} />
       {showTradingWindowGrid ? (
         <>
+          <TradingWindowMarketContextSelector />
+          <TradingWindowMarketWireframeStrip preset={preset} />
           <TradingWindowWireframeStrip preset={preset} />
           <TradingWindowHtsGridPreview preset={preset} />
           <TradingWindowPanelChromePreview preset={preset} />

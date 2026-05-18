@@ -75,6 +75,12 @@ import {
   validateTradingWindowPhase5NoApiNoWebsocket,
   validateTradingWindowWireframePreview,
 } from '../../tradingWindow/tradingWindowPhase5SelfTest'
+import {
+  validateTradingWindowMarketContext,
+  validateTradingWindowMarketMerge,
+  validateTradingWindowMarketNoApiNoWebsocket,
+  validateTradingWindowMarketWireframe,
+} from '../../tradingWindow/tradingWindowPhase6SelfTest'
 
 export type RunUteSelfTestInput = {
   /** Bridge dashboard error count from last mock probe (optional). */
@@ -841,6 +847,42 @@ export function runUteSelfTestSuite(input: RunUteSelfTestInput = {}): SelfTestRe
     label: 'Trading window Phase 5 without API / WebSocket',
     verdict: twPhase5NoNetwork.ok ? 'PASS' : 'FAIL',
     detail: twPhase5NoNetwork.message,
+  })
+
+  const twMarketContext = validateTradingWindowMarketContext()
+  push(checks, {
+    id: 'trading-window-market-context',
+    category: 'layout',
+    label: 'Trading window market context presets',
+    verdict: twMarketContext.ok ? 'PASS' : 'FAIL',
+    detail: twMarketContext.message,
+  })
+
+  const twMarketMerge = validateTradingWindowMarketMerge()
+  push(checks, {
+    id: 'trading-window-market-merge',
+    category: 'layout',
+    label: 'Trading window market merge priority',
+    verdict: twMarketMerge.ok ? 'PASS' : 'FAIL',
+    detail: twMarketMerge.message,
+  })
+
+  const twMarketWireframe = validateTradingWindowMarketWireframe()
+  push(checks, {
+    id: 'trading-window-market-wireframe',
+    category: 'layout',
+    label: 'Trading window market wireframe strip',
+    verdict: twMarketWireframe.ok ? 'PASS' : 'FAIL',
+    detail: twMarketWireframe.message,
+  })
+
+  const twMarketNoNetwork = validateTradingWindowMarketNoApiNoWebsocket()
+  push(checks, {
+    id: 'trading-window-market-no-api-no-websocket',
+    category: 'smoke',
+    label: 'Trading window market layer without API / WebSocket',
+    verdict: twMarketNoNetwork.ok ? 'PASS' : 'FAIL',
+    detail: twMarketNoNetwork.message,
   })
 
   const customSchema = validateCustomTenantSchema()

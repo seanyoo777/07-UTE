@@ -166,6 +166,70 @@ Override blob fields (Phase 5): `mobileVisualPreset`, `mobileStackOrder[]` — s
 
 ---
 
+## Phase 6 — Market context preset layer (implemented)
+
+**Status:** Market-specific UI emphasis layered between tenant preset and tenant override.
+
+| Piece | Role |
+|-------|------|
+| `market/marketContextPresetTypes.ts` | Schema: chart/book/DOM/dock/mobile emphasis |
+| `market/marketContextRegistry.ts` | Six built-in contexts + UI style labels |
+| `market/resolveMarketContextPreset.ts` | Apply layer + `MarketId` default mapping |
+| `market/marketContextStore.ts` | Admin/Preview session market selection |
+| `override/resolveTradingWindowMerge.ts` | 4-tier merge |
+
+### Supported market contexts
+
+| ID | UI style label | Typical use |
+|----|----------------|-------------|
+| `crypto-futures` | Binance style | Crypto perp · DOM side · depth book |
+| `global-futures` | HTS style | Global futures · ladder book |
+| `korea-futures` | HTS style | KR futures · fills dock |
+| `us-stocks` | Robinhood style | US equities · hidden DOM · airy book |
+| `scalping` | Binance style | Fast tape · compact book |
+| `swing` | Robinhood style | Studies-forward · history dock |
+
+`MarketId` route defaults: `crypto` → `crypto-futures`, `global-futures` → `global-futures`, `kr-futures` → `korea-futures`, `us-stock` → `us-stocks`, `kr-stock` → `swing`.
+
+### 4-tier merge priority
+
+```mermaid
+flowchart BT
+  T[Tenant preset]
+  M[Market context preset]
+  S[Saved tenant override]
+  P[Preview draft]
+  T --> M
+  M --> S
+  S --> P
+```
+
+| Priority | Layer | `data-ute-twp-merge-source` (effective) |
+|----------|-------|----------------------------------------|
+| 1 | Tenant built-in / custom `tradingWindow` | `tenant-preset` |
+| 2 | Market context (route or admin preview) | `market-preset` |
+| 3 | Saved override (`ute.trading_window_overrides_v1`) | `saved-override` |
+| 4 | Live admin preview draft | `preview-draft` |
+
+Market attributes on bundle: `data-ute-twp-market-context`, `data-ute-twp-market-style`, `data-ute-twp-chart-emphasis`, `data-ute-twp-dom-visibility`, `data-ute-twp-orderbook-emphasis`.
+
+### Phase 6 UI
+
+- **Preview Center:** `TradingWindowMarketContextSelector` + `TradingWindowMarketWireframeStrip` (per-market cards with Binance / HTS / Robinhood labels).
+- **Admin:** compact market context selector above override compare strip.
+- **Workspace:** `useTradingWindowBundle(tenant, marketId)` applies route market when no admin preview override.
+
+### Phase 6 self-test IDs
+
+| ID | Assertion |
+|----|-----------|
+| `trading-window-market-context` | Registry + emphasis application |
+| `trading-window-market-merge` | preview > saved > market > tenant |
+| `trading-window-market-wireframe` | market attrs + HTS style label |
+| `trading-window-market-no-api-no-websocket` | no network / file IO |
+
+---
+
 ## Phase 0 (Design)
 
 **Status:** Reference below — design baseline for Phases 2+.
@@ -447,7 +511,8 @@ Precedence: `layoutFeatureFlags` (emergency, read-only) **>** trading window pre
 | **3** | Panel chrome | Order book layout modes, order form layout modes, mobile stack order; `data-ute-twp-*` on panels. |
 | **4** | Preview & admin | Trading Window strip in Tenant Preview Center; overrides in Admin Console + localStorage. |
 | **5** | Mobile visual editor + merge + I/O | Mobile stack editor, 3-tier merge, wireframe strip, import/export, diagnostics + self-tests (§9). |
-| **6** (optional) | BLACK DESK / MOBI-X registry | Two new built-in tenants; preview cards. |
+| **6** | Market context layer | Per-market emphasis, 4-tier merge, market wireframes, admin selector, diagnostics + self-tests. |
+| **7** (optional) | BLACK DESK / MOBI-X registry | Two new built-in tenants; preview cards. |
 
 **Out of scope for Phases 1–4:** Replacing `TradingViewChart` with 05 DOM; live CEX order routing.
 

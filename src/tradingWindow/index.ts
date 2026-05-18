@@ -62,6 +62,35 @@ export {
   validateTradingWindowWireframePreview,
   validateTradingWindowPhase5NoApiNoWebsocket,
 } from './tradingWindowPhase5SelfTest'
+export type {
+  MarketContextPreset,
+  MarketContextPresetId,
+  MarketContextUiStyle,
+} from './market/marketContextPresetTypes'
+export {
+  MARKET_CONTEXT_PRESET_IDS,
+} from './market/marketContextPresetTypes'
+export {
+  MARKET_CONTEXT_PRESETS,
+  getMarketContextPreset,
+  listMarketContextPresetIds,
+} from './market/marketContextRegistry'
+export {
+  applyMarketContextLayer,
+  applyMarketContextToTradingPreset,
+  applyMarketContextToHtsGrid,
+  resolveDefaultMarketContextId,
+  resolveMarketContextPreset,
+} from './market/resolveMarketContextPreset'
+export { useMarketContextStore } from './market/marketContextStore'
+export { TradingWindowMarketContextSelector } from './market/TradingWindowMarketContextSelector'
+export { TradingWindowMarketWireframeStrip } from './preview/TradingWindowMarketWireframeStrip'
+export {
+  validateTradingWindowMarketContext,
+  validateTradingWindowMarketMerge,
+  validateTradingWindowMarketWireframe,
+  validateTradingWindowMarketNoApiNoWebsocket,
+} from './tradingWindowPhase6SelfTest'
 export {
   buildPanelChromeClassNames,
   buildPanelChromeDataAttributes,

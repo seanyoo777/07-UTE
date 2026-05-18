@@ -1,4 +1,5 @@
 import type { TenantWhitelabelPreset } from '../../whitelabel/tenantPresetTypes'
+import { useMarketContextStore } from '../market/marketContextStore'
 import { useTradingWindowOverrideStore } from '../override/tradingWindowOverrideStore'
 import { resolveTradingWindowBundle } from '../resolveTradingWindowBundle'
 import { formatPanelChromeSummary, summarizePanelChrome } from '../tradingWindowPanelChrome'
@@ -11,8 +12,14 @@ const MODES = ['orderBook', 'orderForm', 'dock'] as const
 
 export function TradingWindowPanelChromePreview({ preset }: Props) {
   const revision = useTradingWindowOverrideStore((s) => s.revision)
-  const bundle = resolveTradingWindowBundle(preset)
+  const marketRevision = useMarketContextStore((s) => s.revision)
+  const previewContextId = useMarketContextStore((s) => s.previewContextId)
   void revision
+  void marketRevision
+  const bundle = resolveTradingWindowBundle(
+    preset,
+    previewContextId ? { marketContextId: previewContextId } : undefined,
+  )
   const tw = bundle.preset
   const summary = summarizePanelChrome(tw)
 

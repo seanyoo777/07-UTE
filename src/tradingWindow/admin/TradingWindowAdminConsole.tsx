@@ -23,6 +23,7 @@ import { MOBILE_STACK_MODES } from '../override/tradingWindowOverrideTypes'
 import { getHtsGridForProfile } from '../tradingWindowHtsGridDefaults'
 import { TradingWindowOverrideCompareStrip } from './TradingWindowOverrideCompareStrip'
 import { TradingWindowOverrideImportExportPanel } from './TradingWindowOverrideImportExportPanel'
+import { TradingWindowMarketContextSelector } from '../market/TradingWindowMarketContextSelector'
 import { TradingWindowMobileStackEditor } from '../mobile/TradingWindowMobileStackEditor'
 import { resolveWhitelabelPreset } from '../../whitelabel/tenantPresetRegistry'
 
@@ -206,6 +207,8 @@ export function TradingWindowAdminConsole() {
         matches active shell ({activePresetId}
         {liveOnActiveTenant ? ' · synced' : ' · select active tenant to preview workspace'}).
       </p>
+
+      <TradingWindowMarketContextSelector compact />
 
       <TradingWindowOverrideCompareStrip form={form} />
 
