@@ -84,6 +84,25 @@
 
 ---
 
+## Phase 4 — Admin override / live preview (implemented)
+
+**Status:** `TradingWindowAdminConsole` on `/admin` (with WhiteLabel admin flag).
+
+| Piece | Role |
+|-------|------|
+| `override/tradingWindowOverrideStorage.ts` | `ute.trading_window_overrides_v1` localStorage |
+| `override/tradingWindowOverrideStore.ts` | Zustand: saved overrides + live preview draft |
+| `override/tradingWindowOverrideModel.ts` | Admin form ↔ override blob ↔ merged preset |
+| `admin/TradingWindowAdminConsole.tsx` | Tenant/profile/grid/chrome/mobile editors |
+| `admin/TradingWindowOverrideCompareStrip.tsx` | Baseline vs draft compare |
+| `resolveTradingWindowBundle.ts` | Reads effective override per tenant id |
+
+Live preview: `setPreviewFromForm` bumps `revision` → `useTradingWindowBundle`, Preview Center strips, Diagnostics.
+
+**Phase 5** can add mobile stack visual editor + export/import override JSON.
+
+---
+
 ## Phase 0 (Design)
 
 **Status:** Reference below — design baseline for Phases 2+.

@@ -1,4 +1,5 @@
 import type { TenantWhitelabelPreset } from '../../whitelabel/tenantPresetTypes'
+import { useTradingWindowOverrideStore } from '../override/tradingWindowOverrideStore'
 import { resolveTradingWindowBundle } from '../resolveTradingWindowBundle'
 import { formatHtsGridSummary } from '../tradingWindowHtsGridCss'
 
@@ -7,7 +8,9 @@ type Props = {
 }
 
 export function TradingWindowHtsGridPreview({ preset }: Props) {
+  const revision = useTradingWindowOverrideStore((s) => s.revision)
   const bundle = resolveTradingWindowBundle(preset)
+  void revision
   const grid = bundle.htsGrid
 
   return (

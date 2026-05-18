@@ -62,6 +62,12 @@ import {
   validateTradingWindowPresetResolver,
   validateTradingWindowPresetSchema,
 } from '../../tradingWindow/tradingWindowSelfTest'
+import {
+  validateTradingWindowAdminOverride,
+  validateTradingWindowLocalstorage,
+  validateTradingWindowPreviewSync,
+  validateTradingWindowReset,
+} from '../../tradingWindow/tradingWindowAdminSelfTest'
 
 export type RunUteSelfTestInput = {
   /** Bridge dashboard error count from last mock probe (optional). */
@@ -747,6 +753,42 @@ export function runUteSelfTestSuite(input: RunUteSelfTestInput = {}): SelfTestRe
     label: 'Panel chrome without API / WebSocket',
     verdict: twPanelNoNetwork.ok ? 'PASS' : 'FAIL',
     detail: twPanelNoNetwork.message,
+  })
+
+  const twAdminOverride = validateTradingWindowAdminOverride()
+  push(checks, {
+    id: 'trading-window-admin-override',
+    category: 'layout',
+    label: 'Trading window admin override apply',
+    verdict: twAdminOverride.ok ? 'PASS' : 'FAIL',
+    detail: twAdminOverride.message,
+  })
+
+  const twPreviewSync = validateTradingWindowPreviewSync()
+  push(checks, {
+    id: 'trading-window-preview-sync',
+    category: 'layout',
+    label: 'Trading window live preview sync',
+    verdict: twPreviewSync.ok ? 'PASS' : 'FAIL',
+    detail: twPreviewSync.message,
+  })
+
+  const twReset = validateTradingWindowReset()
+  push(checks, {
+    id: 'trading-window-reset',
+    category: 'layout',
+    label: 'Trading window override reset',
+    verdict: twReset.ok ? 'PASS' : 'FAIL',
+    detail: twReset.message,
+  })
+
+  const twLocalStorage = validateTradingWindowLocalstorage()
+  push(checks, {
+    id: 'trading-window-localstorage',
+    category: 'layout',
+    label: 'Trading window overrides localStorage',
+    verdict: twLocalStorage.ok ? 'PASS' : 'FAIL',
+    detail: twLocalStorage.message,
   })
 
   const customSchema = validateCustomTenantSchema()

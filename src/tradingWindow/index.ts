@@ -62,4 +62,14 @@ export {
   validateTradingWindowPresetSchema,
 } from './tradingWindowSelfTest'
 export { TradingWindowDiagnosticsSection } from './TradingWindowDiagnosticsSection'
+export { TradingWindowAdminConsole } from './admin/TradingWindowAdminConsole'
+export { TradingWindowOverrideCompareStrip } from './admin/TradingWindowOverrideCompareStrip'
+export { TRADING_WINDOW_OVERRIDES_STORAGE_KEY } from './override/tradingWindowOverrideTypes'
+export { useTradingWindowOverrideStore } from './override/tradingWindowOverrideStore'
+export {
+  validateTradingWindowAdminOverride,
+  validateTradingWindowLocalstorage,
+  validateTradingWindowPreviewSync,
+  validateTradingWindowReset,
+} from './tradingWindowAdminSelfTest'
 export { useTradingWindowBundle } from './useTradingWindowBundle'

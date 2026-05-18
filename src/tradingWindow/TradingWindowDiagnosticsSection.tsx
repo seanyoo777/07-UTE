@@ -1,6 +1,8 @@
 import { shouldEnableTradingWindowPresets } from '../config/layoutUiGuards'
 import { useEffectiveLayoutFlags } from '../hooks/useEffectiveLayoutFlags'
 import { useTenantWhitelabelStore } from '../whitelabel/tenantWhitelabelStore'
+import { buildTradingWindowOverrideDiagnostics } from './override/tradingWindowOverrideDiagnostics'
+import { useTradingWindowOverrideStore } from './override/tradingWindowOverrideStore'
 import { resolveTradingWindowBundle } from './resolveTradingWindowBundle'
 import { formatHtsGridSummary } from './tradingWindowHtsGridCss'
 import { formatPanelChromeSummary } from './tradingWindowPanelChrome'
@@ -9,9 +11,12 @@ import { validateTradingWindowPreset } from './validateTradingWindowPreset'
 export function TradingWindowDiagnosticsSection() {
   const layoutFlags = useEffectiveLayoutFlags()
   const preset = useTenantWhitelabelStore((s) => s.preset)
+  const revision = useTradingWindowOverrideStore((s) => s.revision)
   if (!shouldEnableTradingWindowPresets(layoutFlags)) return null
 
+  void revision
   const bundle = resolveTradingWindowBundle(preset)
+  const overrideDiag = buildTradingWindowOverrideDiagnostics(preset)
   const tw = bundle.preset
   const valid = validateTradingWindowPreset(tw)
 
@@ -38,6 +43,12 @@ export function TradingWindowDiagnosticsSection() {
         mobile stack <span className="font-mono text-so-fg">{tw.mobile.stackOrder.join(' → ')}</span>
       </p>
       <p className="text-so-muted">valid={valid.ok ? 'yes' : 'no'} · mockOnly</p>
+      <p className="text-so-muted" data-testid="trading-window-override-diagnostics">
+        overrides={overrideDiag.activeOverrideCount} · active=
+        {overrideDiag.hasActiveTenantOverride ? 'yes' : 'no'} · drift=
+        {overrideDiag.presetDrift ? 'yes' : 'no'} · preview=
+        {overrideDiag.previewing ? 'yes' : 'no'}
+      </p>
     </div>
   )
 }

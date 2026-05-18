@@ -1,5 +1,6 @@
 import type { TenantWhitelabelPreset } from '../whitelabel/tenantPresetTypes'
-import { resolveTradingWindowPreset } from './tradingWindowPresetRegistry'
+import { applyTradingWindowTenantOverride } from './override/tradingWindowOverrideModel'
+import { useTradingWindowOverrideStore } from './override/tradingWindowOverrideStore'
 import { buildHtsGridDataAttributes } from './tradingWindowHtsGridCss'
 import {
   buildPanelChromeClassNames,
@@ -9,16 +10,7 @@ import type {
   TradingWindowBundle,
   TradingWindowHtsGrid,
   TradingWindowPreset,
-  TradingWindowProfileId,
 } from './tradingWindowPresetTypes'
-
-const HTS_GRID_BY_PROFILE: Record<TradingWindowProfileId, TradingWindowHtsGrid> = {
-  'private-bank': { chart: 5, orderBook: 2, orderPanel: 2 },
-  'broker-hts': { chart: 4, orderBook: 2, orderPanel: 2 },
-  'global-futures': { chart: 3, orderBook: 2, orderPanel: 3 },
-  'institutional-desk': { chart: 4, orderBook: 3, orderPanel: 2 },
-  'mobile-mts': { chart: 4, orderBook: 2, orderPanel: 2 },
-}
 
 function buildClassNames(preset: TradingWindowPreset) {
   const p = preset.profileId
@@ -39,12 +31,15 @@ function buildClassNames(preset: TradingWindowPreset) {
 function buildDataAttributes(
   preset: TradingWindowPreset,
   htsGrid: TradingWindowHtsGrid,
+  meta: { hasOverride: boolean; driftFromBuiltin: boolean },
 ): Record<string, string> {
   return {
     ...buildHtsGridDataAttributes(htsGrid),
     ...buildPanelChromeDataAttributes(preset),
     'data-ute-twp': preset.profileId,
     'data-ute-twp-mock-only': 'true',
+    'data-ute-twp-override': meta.hasOverride ? 'active' : 'none',
+    'data-ute-twp-override-drift': meta.driftFromBuiltin ? 'yes' : 'no',
     'data-ute-twp-orderbook-layout': preset.orderBook.layout,
     'data-ute-twp-chart-toolbar': preset.chartLayout.toolbar,
     'data-ute-twp-dock-height': preset.positionPanel.dockHeight,
@@ -57,13 +52,18 @@ function buildDataAttributes(
 export function resolveTradingWindowBundle(
   tenantPreset: TenantWhitelabelPreset,
 ): TradingWindowBundle {
-  const preset = resolveTradingWindowPreset(tenantPreset)
-  const htsGrid = HTS_GRID_BY_PROFILE[preset.profileId]
+  const override = useTradingWindowOverrideStore.getState().getOverrideForTenant(tenantPreset.id)
+  const applied = applyTradingWindowTenantOverride(tenantPreset, override)
+  const preset = applied.preset
+  const htsGrid = applied.htsGrid
   return {
     mockOnly: true,
     preset,
     htsGrid,
     classNames: buildClassNames(preset),
-    dataAttributes: buildDataAttributes(preset, htsGrid),
+    dataAttributes: buildDataAttributes(preset, htsGrid, {
+      hasOverride: applied.hasOverride,
+      driftFromBuiltin: applied.driftFromBuiltin,
+    }),
   }
 }

@@ -30,6 +30,7 @@ import {
 } from '../config/layoutUiGuards'
 import { useEffectiveLayoutFlags } from '../hooks/useEffectiveLayoutFlags'
 import { resolveWhitelabelShellClasses } from '../whitelabel/resolveWhitelabelClasses'
+import { TradingWindowAdminConsole } from '../tradingWindow/admin/TradingWindowAdminConsole'
 import { TenantAdminConfigConsole } from '../whitelabel/admin/TenantAdminConfigConsole'
 import { TenantPreviewCenter } from '../whitelabel/preview/TenantPreviewCenter'
 import { useTenantWhitelabelStore } from '../whitelabel/tenantWhitelabelStore'
@@ -312,9 +313,14 @@ export function UnifiedAdminDashboard() {
         ) : null}
 
         {showWhitelabelAdminConfig ? (
-          <section aria-label="Tenant admin config console" className="space-y-2">
-            <TenantAdminConfigConsole />
-          </section>
+          <>
+            <section aria-label="Trading window admin console" className="space-y-2">
+              <TradingWindowAdminConsole />
+            </section>
+            <section aria-label="Tenant admin config console" className="space-y-2">
+              <TenantAdminConfigConsole />
+            </section>
+          </>
         ) : null}
 
         {showGlobalDiagnostics ? (
