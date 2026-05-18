@@ -3,6 +3,7 @@ import { useEffectiveLayoutFlags } from '../hooks/useEffectiveLayoutFlags'
 import { useTenantWhitelabelStore } from '../whitelabel/tenantWhitelabelStore'
 import { resolveTradingWindowBundle } from './resolveTradingWindowBundle'
 import { formatHtsGridSummary } from './tradingWindowHtsGridCss'
+import { formatPanelChromeSummary } from './tradingWindowPanelChrome'
 import { validateTradingWindowPreset } from './validateTradingWindowPreset'
 
 export function TradingWindowDiagnosticsSection() {
@@ -29,6 +30,9 @@ export function TradingWindowDiagnosticsSection() {
       </p>
       <p className="text-so-muted" data-testid="trading-window-hts-grid-diagnostics">
         hts grid · {formatHtsGridSummary(bundle.htsGrid)}
+      </p>
+      <p className="text-so-muted" data-testid="trading-window-panel-chrome-diagnostics">
+        panels · {formatPanelChromeSummary(tw)}
       </p>
       <p className="text-so-muted">
         mobile stack <span className="font-mono text-so-fg">{tw.mobile.stackOrder.join(' → ')}</span>

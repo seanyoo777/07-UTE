@@ -10,6 +10,8 @@ describe('resolveTradingWindowBundle', () => {
     expect(bundle.mockOnly).toBe(true)
     expect(bundle.preset.profileId).toBe('broker-hts')
     expect(bundle.classNames.workspace).toContain('ute-twp-profile-broker-hts')
+    expect(bundle.classNames.orderBook).toContain('ute-twp-panel-orderbook')
+    expect(bundle.classNames.dockPanel).toContain('ute-twp-dock-tabs-elevated')
     expect(bundle.dataAttributes['data-ute-twp']).toBe('broker-hts')
     expect(bundle.dataAttributes['data-ute-twp-mock-only']).toBe('true')
     expect(bundle.dataAttributes['data-ute-twp-grid-chart']).toBe('4')

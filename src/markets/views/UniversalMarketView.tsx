@@ -24,6 +24,13 @@ import { HtsLayout } from '../../layouts/HtsLayout'
 import { TradingLayout } from '../../layouts/TradingLayout'
 import { useTradingStore } from '../../store/tradingStore'
 import type { TradingWindowBundle } from '../../tradingWindow/tradingWindowPresetTypes'
+import {
+  tradingWindowDockInitialTab,
+  tradingWindowDockTabBarClass,
+  wrapTradingWindowDock,
+  wrapTradingWindowOrderBook,
+  wrapTradingWindowOrderPanel,
+} from '../../tradingWindow/panels/wrapTradingWindowPanelChrome'
 import { useTradingWindowBundle } from '../../tradingWindow/useTradingWindowBundle'
 import { useTenantWhitelabelStore } from '../../whitelabel/tenantWhitelabelStore'
 import type { MarketId } from '../types'
@@ -151,7 +158,10 @@ export function UniversalMarketView({ marketId, onMarketChange, mobileHeaderSlot
                 state={speedState}
                 note="현재 mock 호가. 5번 HTS 호가창으로 교체 예정"
               >
-                <OrderBookPanel book={board.orderBook} spec={activeSpec} lastPrice={board.lastPrice} />
+                {wrapTradingWindowOrderBook(
+                  twBundle,
+                  <OrderBookPanel book={board.orderBook} spec={activeSpec} lastPrice={board.lastPrice} />,
+                )}
               </SlotWrap>
             }
             orderPanel={
@@ -162,7 +172,7 @@ export function UniversalMarketView({ marketId, onMarketChange, mobileHeaderSlot
                 state={speedState}
                 note="현재 카테고리 config 기반 mock. 5번 거래 엔진 통합 예정"
               >
-                {orderPanel}
+                {wrapTradingWindowOrderPanel(twBundle, orderPanel)}
               </SlotWrap>
             }
             dock={
@@ -174,13 +184,19 @@ export function UniversalMarketView({ marketId, onMarketChange, mobileHeaderSlot
                   state={speedState}
                   note="포지션·체결 표는 5번 패널로 교체 예정"
                 >
-                  <BottomDock
-                    marketId={marketId}
-                    symbols={board.symbols}
-                    positions={board.positions}
-                    orders={board.orders}
-                    fills={board.fills}
-                  />
+                  {wrapTradingWindowDock(
+                    twBundle,
+                    <BottomDock
+                      key={`dock:${twBundle?.preset.profileId ?? 'default'}`}
+                      marketId={marketId}
+                      symbols={board.symbols}
+                      positions={board.positions}
+                      orders={board.orders}
+                      fills={board.fills}
+                      initialTab={tradingWindowDockInitialTab(twBundle)}
+                      tabBarClassName={tradingWindowDockTabBarClass(twBundle)}
+                    />,
+                  )}
                 </SlotWrap>
               ) : (
                 <LayoutDockPlaceholder />
@@ -213,10 +229,11 @@ export function UniversalMarketView({ marketId, onMarketChange, mobileHeaderSlot
           chart={
             <TradingViewChart spec={activeSpec} lastPrice={board.lastPrice} changePct={changePct} />
           }
-          orderBook={
-            <OrderBookPanel book={board.orderBook} spec={activeSpec} lastPrice={board.lastPrice} />
-          }
-          orderPanel={orderPanel}
+          orderBook={wrapTradingWindowOrderBook(
+            twBundle,
+            <OrderBookPanel book={board.orderBook} spec={activeSpec} lastPrice={board.lastPrice} />,
+          )}
+          orderPanel={wrapTradingWindowOrderPanel(twBundle, orderPanel)}
           history={
             <HistoryPanel
               fills={board.fills}

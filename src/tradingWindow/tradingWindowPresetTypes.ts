@@ -101,9 +101,12 @@ export type TradingWindowBundle = {
   htsGrid: TradingWindowHtsGrid
   classNames: {
     workspace: string
-    orderBook: string
     chart: string
+    orderBook: string
     orderPanel: string
+    positionPanel: string
+    dockPanel: string
+    /** Height token — same as dockPanel height class segment */
     dock: string
   }
   dataAttributes: Record<string, string>

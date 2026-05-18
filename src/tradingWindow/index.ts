@@ -30,12 +30,32 @@ export {
 } from './tradingWindowHtsGridCss'
 export { seedHtsLayoutPixelsFromGrid, estimateHtsMainRowAvailablePx } from './seedHtsLayoutFromGrid'
 export { TradingWindowHtsGridPreview } from './preview/TradingWindowHtsGridPreview'
+export { TradingWindowPanelChromePreview } from './preview/TradingWindowPanelChromePreview'
+export {
+  buildPanelChromeClassNames,
+  buildPanelChromeDataAttributes,
+  formatPanelChromeSummary,
+  resolveDockTabStyleChrome,
+  resolveOrderBookDensityChrome,
+  resolveOrderFormChromeMode,
+  summarizePanelChrome,
+} from './tradingWindowPanelChrome'
+export {
+  wrapTradingWindowDock,
+  wrapTradingWindowOrderBook,
+  wrapTradingWindowOrderPanel,
+} from './panels/wrapTradingWindowPanelChrome'
 export { validateTradingWindowPreset } from './validateTradingWindowPreset'
 export {
   validateTradingWindowGridBrokerHts,
   validateTradingWindowGridGlobalFutures,
   validateTradingWindowGridNoApiNoWebsocket,
   validateTradingWindowGridPrivateBank,
+  validateTradingWindowPanelBrokerHts,
+  validateTradingWindowPanelDockStyle,
+  validateTradingWindowPanelGlobalFutures,
+  validateTradingWindowPanelNoApiNoWebsocket,
+  validateTradingWindowPanelPrivateBank,
   validateTradingWindowInvalidFallback,
   validateTradingWindowNoApiNoWebsocket,
   validateTradingWindowPresetResolver,

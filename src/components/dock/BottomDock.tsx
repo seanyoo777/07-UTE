@@ -18,6 +18,10 @@ type Props = {
   positions: PositionRow[]
   orders: OrderRecordRow[]
   fills: TradeFillRow[]
+  /** UI-only default tab (trading-window preset). */
+  initialTab?: Tab
+  /** Extra class on tab bar row (trading-window dock chrome). */
+  tabBarClassName?: string
 }
 
 /**
@@ -30,7 +34,7 @@ type Props = {
  *  - 주문내역: 전체 주문 기록 (filled/canceled/rejected 포함)
  */
 export function BottomDock(props: Props) {
-  const [tab, setTab] = useState<Tab>('positions')
+  const [tab, setTab] = useState<Tab>(props.initialTab ?? 'positions')
 
   const specsBySymbol = useMemo(() => {
     const map: Record<string, SymbolSpec | undefined> = {}
@@ -51,7 +55,12 @@ export function BottomDock(props: Props) {
       className="so-panel-glow relative flex h-full min-h-0 min-w-0 flex-col overflow-hidden border-t border-so-border bg-gradient-to-b from-so-surface to-so-surface/60"
       aria-label="포지션·주문 도크"
     >
-      <div className="flex shrink-0 items-center gap-1 border-b border-so-border px-2 py-1.5">
+      <div
+        className={[
+          'ute-twp-dock-tab-bar flex shrink-0 items-center gap-1 border-b border-so-border px-2 py-1.5',
+          props.tabBarClassName ?? '',
+        ].join(' ')}
+      >
         <DockTab id="positions" current={tab} label={`포지션 (${props.positions.length})`} onSelect={setTab} />
         <DockTab id="open" current={tab} label={`미체결 (${openOrders.length})`} onSelect={setTab} />
         <DockTab id="fills" current={tab} label={`체결 (${props.fills.length})`} onSelect={setTab} />

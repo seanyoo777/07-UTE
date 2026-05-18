@@ -92,6 +92,67 @@ body {
   pointer-events: none;
 }
 
+/* Trading window preset — panel chrome (Phase 3) */
+.ute-twp-ob-chrome-compact .ute-twp-panel-chrome-root :is(.so-panel-glow, [class*='PanelShell']) {
+  font-size: 12px;
+}
+
+.ute-twp-ob-chrome-compact .ute-twp-panel-chrome-root li {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.ute-twp-ob-chrome-futures-emphasis .ute-twp-panel-chrome-root {
+  border-left: 2px solid color-mix(in srgb, var(--color-so-warn) 55%, transparent);
+}
+
+.ute-twp-ob-density-airy .ute-twp-panel-chrome-root li {
+  padding-top: 0.2rem;
+  padding-bottom: 0.2rem;
+}
+
+.ute-twp-form-chrome-premium .ute-twp-panel-chrome-root {
+  padding: 0.35rem;
+  background: linear-gradient(
+    165deg,
+    color-mix(in srgb, var(--color-so-surface-2) 90%, transparent),
+    color-mix(in srgb, var(--color-so-bg) 95%, transparent)
+  );
+  border-radius: 0.5rem;
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--color-so-accent) 12%, transparent);
+}
+
+.ute-twp-form-chrome-fast .ute-twp-panel-chrome-root {
+  border-left: 2px solid color-mix(in srgb, var(--color-so-accent) 45%, transparent);
+}
+
+.ute-twp-dock-tabs-compact .ute-twp-dock-tab-bar button {
+  padding: 0.2rem 0.45rem;
+  font-size: 10px;
+}
+
+.ute-twp-dock-tabs-elevated .ute-twp-dock-tab-bar button[aria-pressed='true'] {
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--color-so-accent) 35%, transparent);
+}
+
+.ute-twp-dock-tabs-institutional .ute-twp-dock-tab-bar {
+  background: color-mix(in srgb, var(--color-so-surface-2) 70%, transparent);
+}
+
+.ute-twp-dock-tabs-institutional .ute-twp-dock-tab-bar button {
+  border-radius: 0.15rem;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+}
+
+.ute-twp-dock-h-tall .ute-twp-panel-dock {
+  min-height: 12rem;
+}
+
+.ute-twp-dock-h-short .ute-twp-panel-dock {
+  max-height: 14rem;
+}
+
 /* Trading window preset — HTS column flex weights (Phase 2) */
 .ute-twp-hts-grid-active .ute-twp-hts-main-row--weighted .ute-twp-hts-chart-cell {
   flex: var(--ute-twp-flex-chart, 4) 1 0%;

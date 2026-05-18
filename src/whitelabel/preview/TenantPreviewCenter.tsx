@@ -3,6 +3,7 @@ import { shouldEnableTradingWindowPresets } from '../../config/layoutUiGuards'
 import { useEffectiveLayoutFlags } from '../../hooks/useEffectiveLayoutFlags'
 import { PlatformMockOnlyBadge } from '../../platform/PlatformMockOnlyBadge'
 import { TradingWindowHtsGridPreview } from '../../tradingWindow/preview/TradingWindowHtsGridPreview'
+import { TradingWindowPanelChromePreview } from '../../tradingWindow/preview/TradingWindowPanelChromePreview'
 import { useTenantWhitelabelStore } from '../tenantWhitelabelStore'
 import { AdminSkinPreview } from './AdminSkinPreview'
 import { BrandSummaryCard } from './BrandSummaryCard'
@@ -110,7 +111,12 @@ export function TenantPreviewCenter() {
       <BrandSummaryCard summary={bundle.brandSummary} />
       <MenuOrderPreview menuPreset={preset.menu} />
       <LayoutPreviewStrip layout={bundle.layoutPreview} />
-      {showTradingWindowGrid ? <TradingWindowHtsGridPreview preset={preset} /> : null}
+      {showTradingWindowGrid ? (
+        <>
+          <TradingWindowHtsGridPreview preset={preset} />
+          <TradingWindowPanelChromePreview preset={preset} />
+        </>
+      ) : null}
       <AdminSkinPreview skins={bundle.adminSkins} />
     </section>
   )

@@ -1,6 +1,10 @@
 import type { TenantWhitelabelPreset } from '../whitelabel/tenantPresetTypes'
 import { resolveTradingWindowPreset } from './tradingWindowPresetRegistry'
 import { buildHtsGridDataAttributes } from './tradingWindowHtsGridCss'
+import {
+  buildPanelChromeClassNames,
+  buildPanelChromeDataAttributes,
+} from './tradingWindowPanelChrome'
 import type {
   TradingWindowBundle,
   TradingWindowHtsGrid,
@@ -18,16 +22,17 @@ const HTS_GRID_BY_PROFILE: Record<TradingWindowProfileId, TradingWindowHtsGrid> 
 
 function buildClassNames(preset: TradingWindowPreset) {
   const p = preset.profileId
-  const ob = preset.orderBook
   const ch = preset.chartLayout
-  const dock = preset.positionPanel
-  const form = preset.orderForm
+  const panels = buildPanelChromeClassNames(preset)
+  const dockHeight = preset.positionPanel.dockHeight
   return {
     workspace: `ute-twp-root ute-twp-profile-${p}`,
-    orderBook: `ute-twp-orderbook ute-twp-ob-${ob.layout} ute-twp-ob-density-${ob.density}`,
     chart: `ute-twp-chart ute-twp-chart-toolbar-${ch.toolbar}`,
-    orderPanel: `ute-twp-orderform ute-twp-form-${form.layout}`,
-    dock: `ute-twp-dock ute-twp-dock-${dock.dockHeight}`,
+    orderBook: panels.orderBook,
+    orderPanel: panels.orderPanel,
+    positionPanel: panels.positionPanel,
+    dockPanel: panels.dockPanel,
+    dock: `ute-twp-dock ute-twp-dock-h-${dockHeight}`,
   }
 }
 
@@ -37,6 +42,7 @@ function buildDataAttributes(
 ): Record<string, string> {
   return {
     ...buildHtsGridDataAttributes(htsGrid),
+    ...buildPanelChromeDataAttributes(preset),
     'data-ute-twp': preset.profileId,
     'data-ute-twp-mock-only': 'true',
     'data-ute-twp-orderbook-layout': preset.orderBook.layout,

@@ -52,6 +52,11 @@ import {
   validateTradingWindowGridGlobalFutures,
   validateTradingWindowGridNoApiNoWebsocket,
   validateTradingWindowGridPrivateBank,
+  validateTradingWindowPanelBrokerHts,
+  validateTradingWindowPanelDockStyle,
+  validateTradingWindowPanelGlobalFutures,
+  validateTradingWindowPanelNoApiNoWebsocket,
+  validateTradingWindowPanelPrivateBank,
   validateTradingWindowInvalidFallback,
   validateTradingWindowNoApiNoWebsocket,
   validateTradingWindowPresetResolver,
@@ -697,6 +702,51 @@ export function runUteSelfTestSuite(input: RunUteSelfTestInput = {}): SelfTestRe
     label: 'HTS grid layout without API / WebSocket',
     verdict: twGridNoNetwork.ok ? 'PASS' : 'FAIL',
     detail: twGridNoNetwork.message,
+  })
+
+  const twPanelGold = validateTradingWindowPanelPrivateBank()
+  push(checks, {
+    id: 'trading-window-panel-private-bank',
+    category: 'layout',
+    label: 'Panel chrome — private-bank',
+    verdict: twPanelGold.ok ? 'PASS' : 'FAIL',
+    detail: twPanelGold.message,
+  })
+
+  const twPanelBroker = validateTradingWindowPanelBrokerHts()
+  push(checks, {
+    id: 'trading-window-panel-broker-hts',
+    category: 'layout',
+    label: 'Panel chrome — broker-hts',
+    verdict: twPanelBroker.ok ? 'PASS' : 'FAIL',
+    detail: twPanelBroker.message,
+  })
+
+  const twPanelFutures = validateTradingWindowPanelGlobalFutures()
+  push(checks, {
+    id: 'trading-window-panel-global-futures',
+    category: 'layout',
+    label: 'Panel chrome — global-futures',
+    verdict: twPanelFutures.ok ? 'PASS' : 'FAIL',
+    detail: twPanelFutures.message,
+  })
+
+  const twPanelDock = validateTradingWindowPanelDockStyle()
+  push(checks, {
+    id: 'trading-window-panel-dock-style',
+    category: 'layout',
+    label: 'Panel chrome — dock tab styles',
+    verdict: twPanelDock.ok ? 'PASS' : 'FAIL',
+    detail: twPanelDock.message,
+  })
+
+  const twPanelNoNetwork = validateTradingWindowPanelNoApiNoWebsocket()
+  push(checks, {
+    id: 'trading-window-panel-no-api-no-websocket',
+    category: 'smoke',
+    label: 'Panel chrome without API / WebSocket',
+    verdict: twPanelNoNetwork.ok ? 'PASS' : 'FAIL',
+    detail: twPanelNoNetwork.message,
   })
 
   const customSchema = validateCustomTenantSchema()

@@ -68,6 +68,22 @@
 
 ---
 
+## Phase 3 — Panel chrome (implemented)
+
+**Status:** Profile-specific order book / order form / dock chrome via CSS wrappers on `UniversalMarketView`.
+
+| Piece | Role |
+|-------|------|
+| `tradingWindowPanelChrome.ts` | Density / form / dock tab chrome resolution + `classNames` |
+| `panels/TradingWindow*Chrome.tsx` | Wrappers (spread badge, fast-order strip, margin strip) |
+| `panels/wrapTradingWindowPanelChrome.tsx` | `UniversalMarketView` integration helpers |
+| `index.css` | `.ute-twp-ob-chrome-*`, `.ute-twp-form-chrome-*`, `.ute-twp-dock-tabs-*` |
+| `TradingWindowPanelChromePreview.tsx` | Tenant Preview Center strip |
+
+**Phase 4** can add Preview Center wireframe compare + custom tenant panel overrides in admin console.
+
+---
+
 ## Phase 0 (Design)
 
 **Status:** Reference below — design baseline for Phases 2+.
