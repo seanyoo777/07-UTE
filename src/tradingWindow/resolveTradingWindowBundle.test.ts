@@ -12,6 +12,7 @@ describe('resolveTradingWindowBundle', () => {
     expect(bundle.classNames.workspace).toContain('ute-twp-profile-broker-hts')
     expect(bundle.dataAttributes['data-ute-twp']).toBe('broker-hts')
     expect(bundle.dataAttributes['data-ute-twp-mock-only']).toBe('true')
+    expect(bundle.dataAttributes['data-ute-twp-grid-chart']).toBe('4')
     expect(bundle.htsGrid.chart).toBeGreaterThan(0)
   })
 

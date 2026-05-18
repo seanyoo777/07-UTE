@@ -122,6 +122,7 @@ export function UniversalMarketView({ marketId, onMarketChange, mobileHeaderSlot
         <LayoutModeBanner copy={bannerCopy} />
         <div className="min-h-0 flex-1">
           <HtsLayout
+            htsGrid={twBundle?.htsGrid ?? null}
             showSidebar={showChromeSidebar}
             showDock={showBottomDock}
             sidebar={

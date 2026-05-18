@@ -1,5 +1,6 @@
 import type { TenantWhitelabelPreset } from '../whitelabel/tenantPresetTypes'
 import { resolveTradingWindowPreset } from './tradingWindowPresetRegistry'
+import { buildHtsGridDataAttributes } from './tradingWindowHtsGridCss'
 import type {
   TradingWindowBundle,
   TradingWindowHtsGrid,
@@ -30,8 +31,12 @@ function buildClassNames(preset: TradingWindowPreset) {
   }
 }
 
-function buildDataAttributes(preset: TradingWindowPreset): Record<string, string> {
+function buildDataAttributes(
+  preset: TradingWindowPreset,
+  htsGrid: TradingWindowHtsGrid,
+): Record<string, string> {
   return {
+    ...buildHtsGridDataAttributes(htsGrid),
     'data-ute-twp': preset.profileId,
     'data-ute-twp-mock-only': 'true',
     'data-ute-twp-orderbook-layout': preset.orderBook.layout,
@@ -47,11 +52,12 @@ export function resolveTradingWindowBundle(
   tenantPreset: TenantWhitelabelPreset,
 ): TradingWindowBundle {
   const preset = resolveTradingWindowPreset(tenantPreset)
+  const htsGrid = HTS_GRID_BY_PROFILE[preset.profileId]
   return {
     mockOnly: true,
     preset,
-    htsGrid: HTS_GRID_BY_PROFILE[preset.profileId],
+    htsGrid,
     classNames: buildClassNames(preset),
-    dataAttributes: buildDataAttributes(preset),
+    dataAttributes: buildDataAttributes(preset, htsGrid),
   }
 }

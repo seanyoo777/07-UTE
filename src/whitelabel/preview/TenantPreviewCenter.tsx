@@ -1,5 +1,8 @@
 import { useMemo } from 'react'
+import { shouldEnableTradingWindowPresets } from '../../config/layoutUiGuards'
+import { useEffectiveLayoutFlags } from '../../hooks/useEffectiveLayoutFlags'
 import { PlatformMockOnlyBadge } from '../../platform/PlatformMockOnlyBadge'
+import { TradingWindowHtsGridPreview } from '../../tradingWindow/preview/TradingWindowHtsGridPreview'
 import { useTenantWhitelabelStore } from '../tenantWhitelabelStore'
 import { AdminSkinPreview } from './AdminSkinPreview'
 import { BrandSummaryCard } from './BrandSummaryCard'
@@ -77,6 +80,8 @@ function TenantPreviewCard({
 export function TenantPreviewCenter() {
   const preset = useTenantWhitelabelStore((s) => s.preset)
   const setActivePresetId = useTenantWhitelabelStore((s) => s.setActivePresetId)
+  const layoutFlags = useEffectiveLayoutFlags()
+  const showTradingWindowGrid = shouldEnableTradingWindowPresets(layoutFlags)
   const bundle = useMemo(() => buildWhitelabelPreviewBundle(preset), [preset])
 
   return (
@@ -105,6 +110,7 @@ export function TenantPreviewCenter() {
       <BrandSummaryCard summary={bundle.brandSummary} />
       <MenuOrderPreview menuPreset={preset.menu} />
       <LayoutPreviewStrip layout={bundle.layoutPreview} />
+      {showTradingWindowGrid ? <TradingWindowHtsGridPreview preset={preset} /> : null}
       <AdminSkinPreview skins={bundle.adminSkins} />
     </section>
   )

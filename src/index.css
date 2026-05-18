@@ -92,6 +92,26 @@ body {
   pointer-events: none;
 }
 
+/* Trading window preset — HTS column flex weights (Phase 2) */
+.ute-twp-hts-grid-active .ute-twp-hts-main-row--weighted .ute-twp-hts-chart-cell {
+  flex: var(--ute-twp-flex-chart, 4) 1 0%;
+  min-width: 320px;
+}
+
+.ute-twp-hts-grid-active .ute-twp-hts-main-row--weighted .ute-twp-hts-book-cell {
+  flex: var(--ute-twp-flex-book, 2) 0 0;
+  width: var(--ute-twp-book-width, 280px);
+  min-width: 220px;
+  max-width: 420px;
+}
+
+.ute-twp-hts-grid-active .ute-twp-hts-main-row--weighted .ute-twp-hts-order-cell {
+  flex: var(--ute-twp-flex-order, 2) 0 0;
+  width: var(--ute-twp-order-width, 340px);
+  min-width: 280px;
+  max-width: 520px;
+}
+
 /* 모바일 safe-area */
 @supports (padding: env(safe-area-inset-bottom)) {
   body {

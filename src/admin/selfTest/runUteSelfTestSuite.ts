@@ -48,6 +48,10 @@ import {
   validateWhitelabelThemePersistence,
 } from '../../whitelabel/whitelabelSelfTest'
 import {
+  validateTradingWindowGridBrokerHts,
+  validateTradingWindowGridGlobalFutures,
+  validateTradingWindowGridNoApiNoWebsocket,
+  validateTradingWindowGridPrivateBank,
   validateTradingWindowInvalidFallback,
   validateTradingWindowNoApiNoWebsocket,
   validateTradingWindowPresetResolver,
@@ -657,6 +661,42 @@ export function runUteSelfTestSuite(input: RunUteSelfTestInput = {}): SelfTestRe
     label: 'Trading window presets without API / WebSocket',
     verdict: twNoNetwork.ok ? 'PASS' : 'FAIL',
     detail: twNoNetwork.message,
+  })
+
+  const twGridGold = validateTradingWindowGridPrivateBank()
+  push(checks, {
+    id: 'trading-window-grid-private-bank',
+    category: 'layout',
+    label: 'HTS grid — private-bank (chart emphasis)',
+    verdict: twGridGold.ok ? 'PASS' : 'FAIL',
+    detail: twGridGold.message,
+  })
+
+  const twGridBroker = validateTradingWindowGridBrokerHts()
+  push(checks, {
+    id: 'trading-window-grid-broker-hts',
+    category: 'layout',
+    label: 'HTS grid — broker-hts (balanced)',
+    verdict: twGridBroker.ok ? 'PASS' : 'FAIL',
+    detail: twGridBroker.message,
+  })
+
+  const twGridFutures = validateTradingWindowGridGlobalFutures()
+  push(checks, {
+    id: 'trading-window-grid-global-futures',
+    category: 'layout',
+    label: 'HTS grid — global-futures (order panel)',
+    verdict: twGridFutures.ok ? 'PASS' : 'FAIL',
+    detail: twGridFutures.message,
+  })
+
+  const twGridNoNetwork = validateTradingWindowGridNoApiNoWebsocket()
+  push(checks, {
+    id: 'trading-window-grid-no-api-no-websocket',
+    category: 'smoke',
+    label: 'HTS grid layout without API / WebSocket',
+    verdict: twGridNoNetwork.ok ? 'PASS' : 'FAIL',
+    detail: twGridNoNetwork.message,
   })
 
   const customSchema = validateCustomTenantSchema()

@@ -2,6 +2,7 @@ import { shouldEnableTradingWindowPresets } from '../config/layoutUiGuards'
 import { useEffectiveLayoutFlags } from '../hooks/useEffectiveLayoutFlags'
 import { useTenantWhitelabelStore } from '../whitelabel/tenantWhitelabelStore'
 import { resolveTradingWindowBundle } from './resolveTradingWindowBundle'
+import { formatHtsGridSummary } from './tradingWindowHtsGridCss'
 import { validateTradingWindowPreset } from './validateTradingWindowPreset'
 
 export function TradingWindowDiagnosticsSection() {
@@ -26,9 +27,8 @@ export function TradingWindowDiagnosticsSection() {
         book={tw.orderBook.layout} · chart={tw.chartLayout.toolbar} · dock=
         {tw.positionPanel.dockHeight}
       </p>
-      <p className="text-so-muted">
-        hts grid chart:{bundle.htsGrid.chart} book:{bundle.htsGrid.orderBook} order:
-        {bundle.htsGrid.orderPanel}
+      <p className="text-so-muted" data-testid="trading-window-hts-grid-diagnostics">
+        hts grid · {formatHtsGridSummary(bundle.htsGrid)}
       </p>
       <p className="text-so-muted">
         mobile stack <span className="font-mono text-so-fg">{tw.mobile.stackOrder.join(' → ')}</span>

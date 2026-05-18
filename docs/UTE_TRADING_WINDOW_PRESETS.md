@@ -51,6 +51,23 @@
 
 ---
 
+## Phase 2 — HtsLayout grid weights (implemented)
+
+**Status:** `htsGrid` drives `HtsLayout` column proportions via CSS variables (`--ute-twp-flex-*`) and optional pixel seeding for resize handles.
+
+| Piece | Role |
+|-------|------|
+| `tradingWindowHtsGridCss.ts` | CSS vars, `data-ute-twp-grid-*`, share % helper |
+| `seedHtsLayoutFromGrid.ts` | Weight → initial `bookPx` / `orderPx` on profile switch |
+| `HtsLayout.tsx` | `htsGrid` prop, `ute-twp-hts-grid-active` class |
+| `index.css` | Flex rules for chart / book / order cells |
+| `TradingWindowHtsGridPreview.tsx` | Tenant Preview Center strip |
+| Self-test | `trading-window-grid-private-bank`, `…-broker-hts`, `…-global-futures`, `…-grid-no-api-no-websocket` |
+
+**Phase 3** can apply sub-preset classes to individual panels (`OrderBookPanel`, `OrderPanel`, dock) without changing grid plumbing.
+
+---
+
 ## Phase 0 (Design)
 
 **Status:** Reference below — design baseline for Phases 2+.

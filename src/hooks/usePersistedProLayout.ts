@@ -66,6 +66,8 @@ export type PersistedProLayout = ProLayoutState & {
   resetOrder: () => void
   resetDock: () => void
   resetAll: () => void
+  /** Apply book/order px from trading-window htsGrid seed (UI only). */
+  seedBookOrderFromGrid: (bookPx: number, orderPx: number) => void
 }
 
 export function usePersistedProLayout(): PersistedProLayout {
@@ -133,6 +135,16 @@ export function usePersistedProLayout(): PersistedProLayout {
   )
   const resetAll = useCallback(() => update(() => ({ ...PRO_LAYOUT_DEFAULTS })), [update])
 
+  const seedBookOrderFromGrid = useCallback(
+    (bookPx: number, orderPx: number) =>
+      update((p) => ({
+        ...p,
+        bookPx: clampLayout(bookPx, PRO_LAYOUT_LIMITS.book.min, PRO_LAYOUT_LIMITS.book.max),
+        orderPx: clampLayout(orderPx, PRO_LAYOUT_LIMITS.order.min, PRO_LAYOUT_LIMITS.order.max),
+      })),
+    [update],
+  )
+
   return useMemo(
     () => ({
       ...layout,
@@ -145,6 +157,7 @@ export function usePersistedProLayout(): PersistedProLayout {
       resetOrder,
       resetDock,
       resetAll,
+      seedBookOrderFromGrid,
     }),
     [
       layout,
@@ -157,6 +170,7 @@ export function usePersistedProLayout(): PersistedProLayout {
       resetOrder,
       resetDock,
       resetAll,
+      seedBookOrderFromGrid,
     ],
   )
 }
