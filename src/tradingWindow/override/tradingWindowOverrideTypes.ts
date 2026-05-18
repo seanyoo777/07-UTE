@@ -1,4 +1,9 @@
-import type { TradingWindowHtsGrid, TradingWindowProfileId } from '../tradingWindowPresetTypes'
+import type {
+  MobileStackSlotId,
+  TradingWindowHtsGrid,
+  TradingWindowProfileId,
+} from '../tradingWindowPresetTypes'
+import type { MobileVisualPresetId } from '../mobile/mobileStackPreview'
 import type {
   DockTabStyleChrome,
   OrderBookDensityChrome,
@@ -24,6 +29,10 @@ export type TradingWindowTenantOverride = {
   dockTabStyle: DockTabStyleChrome
   dockHeight: 'short' | 'standard' | 'tall'
   mobileStackMode: MobileStackMode
+  /** Phase 5 visual editor preset (compact / balanced / futures / mobile-mts). */
+  mobileVisualPreset: MobileVisualPresetId
+  /** Custom stack order from drag mock editor. */
+  mobileStackOrder: MobileStackSlotId[]
 }
 
 export type TradingWindowOverridesStorageBlob = {

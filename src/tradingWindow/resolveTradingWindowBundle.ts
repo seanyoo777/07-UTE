@@ -1,6 +1,5 @@
 import type { TenantWhitelabelPreset } from '../whitelabel/tenantPresetTypes'
-import { applyTradingWindowTenantOverride } from './override/tradingWindowOverrideModel'
-import { useTradingWindowOverrideStore } from './override/tradingWindowOverrideStore'
+import { resolveTradingWindowMerge } from './override/resolveTradingWindowMerge'
 import { buildHtsGridDataAttributes } from './tradingWindowHtsGridCss'
 import {
   buildPanelChromeClassNames,
@@ -31,7 +30,12 @@ function buildClassNames(preset: TradingWindowPreset) {
 function buildDataAttributes(
   preset: TradingWindowPreset,
   htsGrid: TradingWindowHtsGrid,
-  meta: { hasOverride: boolean; driftFromBuiltin: boolean },
+  meta: {
+    mergeSource: string
+    hasOverride: boolean
+    driftFromBuiltin: boolean
+    usedFallback: boolean
+  },
 ): Record<string, string> {
   return {
     ...buildHtsGridDataAttributes(htsGrid),
@@ -40,6 +44,8 @@ function buildDataAttributes(
     'data-ute-twp-mock-only': 'true',
     'data-ute-twp-override': meta.hasOverride ? 'active' : 'none',
     'data-ute-twp-override-drift': meta.driftFromBuiltin ? 'yes' : 'no',
+    'data-ute-twp-merge-source': meta.mergeSource,
+    'data-ute-twp-fallback': meta.usedFallback ? 'yes' : 'no',
     'data-ute-twp-orderbook-layout': preset.orderBook.layout,
     'data-ute-twp-chart-toolbar': preset.chartLayout.toolbar,
     'data-ute-twp-dock-height': preset.positionPanel.dockHeight,
@@ -52,18 +58,19 @@ function buildDataAttributes(
 export function resolveTradingWindowBundle(
   tenantPreset: TenantWhitelabelPreset,
 ): TradingWindowBundle {
-  const override = useTradingWindowOverrideStore.getState().getOverrideForTenant(tenantPreset.id)
-  const applied = applyTradingWindowTenantOverride(tenantPreset, override)
-  const preset = applied.preset
-  const htsGrid = applied.htsGrid
+  const merged = resolveTradingWindowMerge(tenantPreset)
+  const preset = merged.preset
+  const htsGrid = merged.htsGrid
   return {
     mockOnly: true,
     preset,
     htsGrid,
     classNames: buildClassNames(preset),
     dataAttributes: buildDataAttributes(preset, htsGrid, {
-      hasOverride: applied.hasOverride,
-      driftFromBuiltin: applied.driftFromBuiltin,
+      mergeSource: merged.mergeSource,
+      hasOverride: merged.mergeSource !== 'tenant-preset',
+      driftFromBuiltin: merged.driftFromBuiltin,
+      usedFallback: merged.usedFallback,
     }),
   }
 }

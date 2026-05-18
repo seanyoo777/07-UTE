@@ -44,10 +44,10 @@ export function TradingWindowDiagnosticsSection() {
       </p>
       <p className="text-so-muted">valid={valid.ok ? 'yes' : 'no'} · mockOnly</p>
       <p className="text-so-muted" data-testid="trading-window-override-diagnostics">
-        overrides={overrideDiag.activeOverrideCount} · active=
-        {overrideDiag.hasActiveTenantOverride ? 'yes' : 'no'} · drift=
-        {overrideDiag.presetDrift ? 'yes' : 'no'} · preview=
-        {overrideDiag.previewing ? 'yes' : 'no'}
+        overrides={overrideDiag.activeOverrideCount} · source={overrideDiag.mergeSource} · drift=
+        {overrideDiag.presetDrift ? 'yes' : 'no'} · draft=
+        {overrideDiag.previewDraftActive ? 'yes' : 'no'} · mobile=
+        {overrideDiag.mobileVisualPreset} · import/export ready
       </p>
     </div>
   )

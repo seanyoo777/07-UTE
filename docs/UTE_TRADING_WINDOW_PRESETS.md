@@ -99,7 +99,70 @@
 
 Live preview: `setPreviewFromForm` bumps `revision` → `useTradingWindowBundle`, Preview Center strips, Diagnostics.
 
-**Phase 5** can add mobile stack visual editor + export/import override JSON.
+---
+
+## Phase 5 — Mobile visual editor, merge layer, import/export (implemented)
+
+**Status:** Visual editor + 3-tier merge + wireframe strip + clipboard/textarea import/export.
+
+| Piece | Role |
+|-------|------|
+| `mobile/TradingWindowMobileStackEditor.tsx` | Mock drag (↑↓ + HTML5 drag), visual presets, thumb-zone / bottom-sheet preview |
+| `mobile/mobileStackPreview.ts` | `compact` · `balanced` · `futures` · `mobile-mts` stack metadata |
+| `mobile/mobileStackWireframe.ts` | Desktop HTS + mobile MTS wireframe models |
+| `override/resolveTradingWindowMerge.ts` | `resolveEffectiveOverride` + `resolveTradingWindowMerge` |
+| `override/tradingWindowOverrideImportExport.ts` | Export JSON (clipboard); import (textarea paste); schema + `mockOnly` gate |
+| `admin/TradingWindowOverrideImportExportPanel.tsx` | Admin UI for import/export |
+| `preview/TradingWindowWireframeStrip.tsx` | Preview Center: HTS grid, MTS stack, dock open, book emphasis |
+
+### Merge priority (3-tier)
+
+Higher layer wins when present for the active tenant id:
+
+```mermaid
+flowchart BT
+  T[Built-in / custom tenant preset]
+  S[Saved override — localStorage ute.trading_window_overrides_v1]
+  P[Session preview draft — Zustand admin form]
+  T --> S
+  S --> P
+```
+
+| Priority | Source | `data-ute-twp-merge-source` |
+|----------|--------|-----------------------------|
+| 1 (base) | Tenant `tradingWindow` on whitelabel preset | `tenant-preset` |
+| 2 | Saved override blob | `saved-override` |
+| 3 (highest) | Live admin preview draft | `preview-draft` |
+
+`resolveTradingWindowBundle()` calls `resolveTradingWindowMerge()` and exposes merge metadata on `data-ute-twp-*` attributes.
+
+### Mobile stack visual presets (examples)
+
+| Preset id | Typical stack (top → bottom) | Notes |
+|-----------|------------------------------|-------|
+| `compact` | ticker → chart → book → order → history | Dense MTS; smaller thumb band |
+| `balanced` | ticker → chart → book → order → history | Default retail MTS |
+| `futures` | ticker → chart → **order** → book → history | Order-first thumb zone |
+| `mobile-mts` | ticker → chart → book → order → history | Sticky bottom sheet on order + book |
+
+Override blob fields (Phase 5): `mobileVisualPreset`, `mobileStackOrder[]` — stored in the same localStorage key; no file auto-read.
+
+### Import / export rules
+
+- **Export:** clipboard text only (`navigator.clipboard` with console fallback).
+- **Import:** admin textarea paste → `parseOverridesImport` → `importOverrides()`.
+- **Rejected:** `mockOnly !== true`, schema version mismatch, invalid rows (WARN for partial invalid).
+- **Forbidden:** `fetch`, file picker auto-read, WebSocket.
+
+### Phase 5 self-test IDs
+
+| ID | Assertion |
+|----|-----------|
+| `trading-window-mobile-stack` | Visual presets + `normalizeStackOrder` |
+| `trading-window-override-import-export` | JSON round-trip + `mockOnly` enforcement |
+| `trading-window-merge-priority` | preview > saved > tenant |
+| `trading-window-wireframe-preview` | bundle merge attrs + HTS grid |
+| `trading-window-phase5-no-api-no-websocket` | no network in Phase 5 surfaces |
 
 ---
 
@@ -382,8 +445,8 @@ Precedence: `layoutFeatureFlags` (emergency, read-only) **>** trading window pre
 | **1** | Types + registry | `tradingWindowPresetTypes.ts`, extend `mockTenantPresets`, `validateTradingWindowPreset`, `resolveTradingWindowBundle` (classes only, minimal visual change). |
 | **2** | HtsLayout grid | Flex weights + dock height defaults from preset; feature flag `enableTradingWindowPresets`. |
 | **3** | Panel chrome | Order book layout modes, order form layout modes, mobile stack order; `data-ute-twp-*` on panels. |
-| **4** | Preview & admin | Trading Window strip in Tenant Preview Center; optional overrides in Tenant Admin Config Console. |
-| **5** | Diagnostics & self-test | Diagnostics section + self-test IDs (§9). |
+| **4** | Preview & admin | Trading Window strip in Tenant Preview Center; overrides in Admin Console + localStorage. |
+| **5** | Mobile visual editor + merge + I/O | Mobile stack editor, 3-tier merge, wireframe strip, import/export, diagnostics + self-tests (§9). |
 | **6** (optional) | BLACK DESK / MOBI-X registry | Two new built-in tenants; preview cards. |
 
 **Out of scope for Phases 1–4:** Replacing `TradingViewChart` with 05 DOM; live CEX order routing.

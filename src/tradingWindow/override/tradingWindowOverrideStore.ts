@@ -7,6 +7,7 @@ import {
 import {
   loadTradingWindowOverridesFromStorage,
   removeTradingWindowOverrideFromStorage,
+  saveTradingWindowOverridesToStorage,
   upsertTradingWindowOverrideInStorage,
   clearTradingWindowOverridesStorage,
 } from './tradingWindowOverrideStorage'
@@ -29,6 +30,7 @@ type TradingWindowOverrideState = {
   resetTenantOverride: (tenantPresetId: string) => void
   resetAllOverrides: () => void
   countOverrides: () => number
+  importOverrides: (overrides: Record<string, TradingWindowTenantOverride>) => void
 }
 
 export const useTradingWindowOverrideStore = create<TradingWindowOverrideState>()((set, get) => ({
@@ -82,4 +84,8 @@ export const useTradingWindowOverrideStore = create<TradingWindowOverrideState>(
     set({ overrides: {}, preview: null, revision: get().revision + 1 })
   },
   countOverrides: () => Object.keys(get().overrides).length,
+  importOverrides: (overrides) => {
+    saveTradingWindowOverridesToStorage(overrides)
+    set({ overrides, revision: get().revision + 1 })
+  },
 }))

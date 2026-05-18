@@ -22,6 +22,8 @@ import { useTradingWindowOverrideStore } from '../override/tradingWindowOverride
 import { MOBILE_STACK_MODES } from '../override/tradingWindowOverrideTypes'
 import { getHtsGridForProfile } from '../tradingWindowHtsGridDefaults'
 import { TradingWindowOverrideCompareStrip } from './TradingWindowOverrideCompareStrip'
+import { TradingWindowOverrideImportExportPanel } from './TradingWindowOverrideImportExportPanel'
+import { TradingWindowMobileStackEditor } from '../mobile/TradingWindowMobileStackEditor'
 import { resolveWhitelabelPreset } from '../../whitelabel/tenantPresetRegistry'
 
 const DENSITY_OPTIONS: OrderBookDensityChrome[] = ['compact', 'standard', 'futures-emphasis']
@@ -207,6 +209,8 @@ export function TradingWindowAdminConsole() {
 
       <TradingWindowOverrideCompareStrip form={form} />
 
+      <TradingWindowOverrideImportExportPanel tenantPresetId={selectedId} />
+
       <div className="grid gap-4 lg:grid-cols-[minmax(0,160px)_minmax(0,1fr)_minmax(0,260px)]">
         <aside className="space-y-1">
           <p className="text-[9px] font-semibold uppercase tracking-wide text-so-muted">Tenant</p>
@@ -296,6 +300,18 @@ export function TradingWindowAdminConsole() {
         </div>
 
         <div className="space-y-2">
+          <TradingWindowMobileStackEditor
+            stackOrder={form.mobileStackOrder}
+            visualPreset={form.mobileVisualPreset}
+            onChange={({ stackOrder, visualPreset }) =>
+              updateForm({
+                mobileStackOrder: stackOrder,
+                mobileVisualPreset: visualPreset,
+                mobileStackMode:
+                  visualPreset === 'futures' ? 'order-first' : 'standard',
+              })
+            }
+          />
           <TradingWindowHtsGridPreview preset={previewPreset} />
           <TradingWindowPanelChromePreview preset={previewPreset} />
         </div>

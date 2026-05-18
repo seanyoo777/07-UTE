@@ -68,6 +68,13 @@ import {
   validateTradingWindowPreviewSync,
   validateTradingWindowReset,
 } from '../../tradingWindow/tradingWindowAdminSelfTest'
+import {
+  validateTradingWindowMergePriority,
+  validateTradingWindowMobileStack,
+  validateTradingWindowOverrideImportExport,
+  validateTradingWindowPhase5NoApiNoWebsocket,
+  validateTradingWindowWireframePreview,
+} from '../../tradingWindow/tradingWindowPhase5SelfTest'
 
 export type RunUteSelfTestInput = {
   /** Bridge dashboard error count from last mock probe (optional). */
@@ -789,6 +796,51 @@ export function runUteSelfTestSuite(input: RunUteSelfTestInput = {}): SelfTestRe
     label: 'Trading window overrides localStorage',
     verdict: twLocalStorage.ok ? 'PASS' : 'FAIL',
     detail: twLocalStorage.message,
+  })
+
+  const twMobileStack = validateTradingWindowMobileStack()
+  push(checks, {
+    id: 'trading-window-mobile-stack',
+    category: 'layout',
+    label: 'Trading window mobile stack visual editor',
+    verdict: twMobileStack.ok ? 'PASS' : 'FAIL',
+    detail: twMobileStack.message,
+  })
+
+  const twImportExport = validateTradingWindowOverrideImportExport()
+  push(checks, {
+    id: 'trading-window-override-import-export',
+    category: 'layout',
+    label: 'Trading window override JSON import/export',
+    verdict: twImportExport.ok ? 'PASS' : 'FAIL',
+    detail: twImportExport.message,
+  })
+
+  const twMergePriority = validateTradingWindowMergePriority()
+  push(checks, {
+    id: 'trading-window-merge-priority',
+    category: 'layout',
+    label: 'Trading window merge priority (preview > saved > tenant)',
+    verdict: twMergePriority.ok ? 'PASS' : 'FAIL',
+    detail: twMergePriority.message,
+  })
+
+  const twWireframe = validateTradingWindowWireframePreview()
+  push(checks, {
+    id: 'trading-window-wireframe-preview',
+    category: 'layout',
+    label: 'Trading window wireframe strip preview',
+    verdict: twWireframe.ok ? 'PASS' : 'FAIL',
+    detail: twWireframe.message,
+  })
+
+  const twPhase5NoNetwork = validateTradingWindowPhase5NoApiNoWebsocket()
+  push(checks, {
+    id: 'trading-window-phase5-no-api-no-websocket',
+    category: 'smoke',
+    label: 'Trading window Phase 5 without API / WebSocket',
+    verdict: twPhase5NoNetwork.ok ? 'PASS' : 'FAIL',
+    detail: twPhase5NoNetwork.message,
   })
 
   const customSchema = validateCustomTenantSchema()

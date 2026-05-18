@@ -16,6 +16,14 @@ import type {
   MobileStackMode,
   TradingWindowTenantOverride,
 } from './tradingWindowOverrideTypes'
+import {
+  applyMobileVisualPreset,
+  inferMobileVisualPreset,
+  MOBILE_VISUAL_PRESET_IDS,
+  normalizeStackOrder,
+  type MobileVisualPresetId,
+} from '../mobile/mobileStackPreview'
+import type { MobileStackSlotId } from '../tradingWindowPresetTypes'
 import { MOBILE_STACK_MODES } from './tradingWindowOverrideTypes'
 
 export type TradingWindowAdminFormState = {
@@ -29,12 +37,8 @@ export type TradingWindowAdminFormState = {
   dockTabStyle: DockTabStyleChrome
   dockHeight: 'short' | 'standard' | 'tall'
   mobileStackMode: MobileStackMode
-}
-
-const MOBILE_STACK_BY_MODE: Record<MobileStackMode, TradingWindowPreset['mobile']['stackOrder']> = {
-  standard: ['ticker', 'chart', 'book', 'order', 'history'],
-  'trading-first': ['ticker', 'chart', 'book', 'order', 'history'],
-  'order-first': ['ticker', 'chart', 'order', 'book', 'history'],
+  mobileVisualPreset: MobileVisualPresetId
+  mobileStackOrder: MobileStackSlotId[]
 }
 
 export function adminFormFromTenantId(
@@ -56,6 +60,8 @@ export function adminFormFromTenantId(
     dockTabStyle: resolveDockTabStyleChrome(tw),
     dockHeight: tw.positionPanel.dockHeight,
     mobileStackMode: inferMobileStackMode(tw.mobile.stackOrder),
+    mobileVisualPreset: inferMobileVisualPreset(tw.mobile.stackOrder, tw.mobile),
+    mobileStackOrder: [...tw.mobile.stackOrder],
   }
 }
 
@@ -71,6 +77,8 @@ export function overrideToAdminForm(override: TradingWindowTenantOverride): Trad
     dockTabStyle: override.dockTabStyle,
     dockHeight: override.dockHeight,
     mobileStackMode: override.mobileStackMode,
+    mobileVisualPreset: override.mobileVisualPreset,
+    mobileStackOrder: [...override.mobileStackOrder],
   }
 }
 
@@ -90,6 +98,8 @@ export function adminFormToOverride(form: TradingWindowAdminFormState): TradingW
     dockTabStyle: form.dockTabStyle,
     dockHeight: form.dockHeight,
     mobileStackMode: form.mobileStackMode,
+    mobileVisualPreset: form.mobileVisualPreset,
+    mobileStackOrder: normalizeStackOrder(form.mobileStackOrder),
   }
 }
 
@@ -176,6 +186,7 @@ export function applyTradingWindowTenantOverride(
   }
 
   const profileBase = getTradingWindowProfile(override.profileId)
+  const mobileFromVisual = applyMobileVisualPreset(override.mobileVisualPreset)
   const merged: TradingWindowPreset = {
     ...profileBase,
     orderBook: applyDensityChrome(profileBase, override.orderBookDensity),
@@ -183,7 +194,8 @@ export function applyTradingWindowTenantOverride(
     positionPanel: applyDockChrome(profileBase, override.dockTabStyle, override.dockHeight),
     mobile: {
       ...profileBase.mobile,
-      stackOrder: [...MOBILE_STACK_BY_MODE[override.mobileStackMode]],
+      ...mobileFromVisual,
+      stackOrder: normalizeStackOrder(override.mobileStackOrder),
     },
   }
 
@@ -200,6 +212,36 @@ export function applyTradingWindowTenantOverride(
   }
 }
 
+/** Backfill Phase 5 fields on legacy override blobs. */
+export function coerceTradingWindowTenantOverride(
+  row: unknown,
+): TradingWindowTenantOverride | null {
+  if (!row || typeof row !== 'object') return null
+  const o = row as Partial<TradingWindowTenantOverride>
+  if (o.mockOnly !== true || !o.tenantPresetId?.trim()) return null
+  const form = adminFormFromTenantId(o.tenantPresetId, null)
+  const merged: TradingWindowTenantOverride = {
+    ...adminFormToOverride({
+      ...form,
+      profileId: o.profileId ?? form.profileId,
+      htsChart: o.htsGrid?.chart ?? form.htsChart,
+      htsBook: o.htsGrid?.orderBook ?? form.htsBook,
+      htsOrder: o.htsGrid?.orderPanel ?? form.htsOrder,
+      orderBookDensity: o.orderBookDensity ?? form.orderBookDensity,
+      orderFormMode: o.orderFormMode ?? form.orderFormMode,
+      dockTabStyle: o.dockTabStyle ?? form.dockTabStyle,
+      dockHeight: o.dockHeight ?? form.dockHeight,
+      mobileStackMode: o.mobileStackMode ?? form.mobileStackMode,
+      mobileVisualPreset: o.mobileVisualPreset ?? form.mobileVisualPreset,
+      mobileStackOrder: o.mobileStackOrder
+        ? normalizeStackOrder(o.mobileStackOrder)
+        : form.mobileStackOrder,
+    }),
+    updatedAtMs: o.updatedAtMs ?? Date.now(),
+  }
+  return merged
+}
+
 export function validateTradingWindowTenantOverride(
   row: unknown,
 ): { ok: boolean; message: string } {
@@ -210,6 +252,12 @@ export function validateTradingWindowTenantOverride(
   if (!o.htsGrid || o.htsGrid.chart < 1) return { ok: false, message: 'htsGrid invalid' }
   if (!MOBILE_STACK_MODES.includes(o.mobileStackMode)) {
     return { ok: false, message: 'mobileStackMode invalid' }
+  }
+  if (!MOBILE_VISUAL_PRESET_IDS.includes(o.mobileVisualPreset)) {
+    return { ok: false, message: 'mobileVisualPreset invalid' }
+  }
+  if (!Array.isArray(o.mobileStackOrder) || o.mobileStackOrder.length < 3) {
+    return { ok: false, message: 'mobileStackOrder invalid' }
   }
   return { ok: true, message: 'override valid' }
 }

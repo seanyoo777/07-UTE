@@ -31,6 +31,37 @@ export {
 export { seedHtsLayoutPixelsFromGrid, estimateHtsMainRowAvailablePx } from './seedHtsLayoutFromGrid'
 export { TradingWindowHtsGridPreview } from './preview/TradingWindowHtsGridPreview'
 export { TradingWindowPanelChromePreview } from './preview/TradingWindowPanelChromePreview'
+export { TradingWindowWireframeStrip } from './preview/TradingWindowWireframeStrip'
+export { TradingWindowMobileStackEditor } from './mobile/TradingWindowMobileStackEditor'
+export {
+  MOBILE_VISUAL_PRESETS,
+  MOBILE_VISUAL_PRESET_IDS,
+  applyMobileVisualPreset,
+  normalizeStackOrder,
+} from './mobile/mobileStackPreview'
+export {
+  buildHtsWireframeModel,
+  buildMobileWireframeModel,
+  slotLabel,
+} from './mobile/mobileStackWireframe'
+export {
+  resolveEffectiveOverride,
+  resolveTradingWindowMerge,
+  type TradingWindowMergeSource,
+} from './override/resolveTradingWindowMerge'
+export {
+  exportOverridesJson,
+  exportOverridesToClipboardText,
+  parseOverridesImport,
+} from './override/tradingWindowOverrideImportExport'
+export { TradingWindowOverrideImportExportPanel } from './admin/TradingWindowOverrideImportExportPanel'
+export {
+  validateTradingWindowMobileStack,
+  validateTradingWindowOverrideImportExport,
+  validateTradingWindowMergePriority,
+  validateTradingWindowWireframePreview,
+  validateTradingWindowPhase5NoApiNoWebsocket,
+} from './tradingWindowPhase5SelfTest'
 export {
   buildPanelChromeClassNames,
   buildPanelChromeDataAttributes,

@@ -6,7 +6,10 @@ import {
   TRADING_WINDOW_OVERRIDES_STORAGE_KEY,
   TRADING_WINDOW_OVERRIDES_STORAGE_VERSION,
 } from './tradingWindowOverrideTypes'
-import { validateTradingWindowTenantOverride } from './tradingWindowOverrideModel'
+import {
+  coerceTradingWindowTenantOverride,
+  validateTradingWindowTenantOverride,
+} from './tradingWindowOverrideModel'
 
 export function loadTradingWindowOverridesFromStorage(): Record<string, TradingWindowTenantOverride> {
   if (typeof window === 'undefined') return {}
@@ -20,8 +23,9 @@ export function loadTradingWindowOverridesFromStorage(): Record<string, TradingW
     if (!parsed.overrides || typeof parsed.overrides !== 'object') return {}
     const out: Record<string, TradingWindowTenantOverride> = {}
     for (const [id, row] of Object.entries(parsed.overrides)) {
-      if (validateTradingWindowTenantOverride(row).ok) {
-        out[id] = row
+      const coerced = coerceTradingWindowTenantOverride(row)
+      if (coerced && validateTradingWindowTenantOverride(coerced).ok) {
+        out[id] = coerced
       }
     }
     return out
