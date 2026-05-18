@@ -1,13 +1,24 @@
 import { useMemo } from 'react'
 import { BottomDock } from '../../components/dock/BottomDock'
 import { HistoryPanel } from '../../components/history/HistoryPanel'
+import { LayoutDockPlaceholder } from '../../components/layout/LayoutDockPlaceholder'
+import { LayoutModeBanner } from '../../components/layout/LayoutModeBanner'
+import { LayoutSidebarPlaceholder } from '../../components/layout/LayoutSidebarPlaceholder'
 import { OrderBookPanel } from '../../components/orderbook/OrderBookPanel'
 import { OrderPanel } from '../../components/order/OrderPanel'
 import { MarketSidebar } from '../../components/sidebar/MarketSidebar'
 import { TickerBar } from '../../components/ticker/TickerBar'
 import { TradingViewChart } from '../../components/chart/TradingViewChart'
 import { IntegrationSlot } from '../../components/common/IntegrationSlot'
+import {
+  getLayoutModeBannerCopy,
+  isOrderPanelReadOnly,
+  shouldShowBottomDock,
+  shouldShowChromeSidebar,
+  shouldShowIntegrationSlot,
+} from '../../config/layoutUiGuards'
 import type { SymbolSpec } from '../../core/symbols/SymbolSpec'
+import { useEffectiveLayoutFlags } from '../../hooks/useEffectiveLayoutFlags'
 import { useMarketSubscription } from '../../hooks/useMarketSubscription'
 import { HtsLayout } from '../../layouts/HtsLayout'
 import { TradingLayout } from '../../layouts/TradingLayout'
@@ -21,14 +32,40 @@ type Props = {
   mobileHeaderSlot?: React.ReactNode
 }
 
+type SlotWrapProps = {
+  showBadge: boolean
+  source: '05-SpeedOrder' | '02-TGX-CEX'
+  module: string
+  state?: 'planned' | 'in-progress'
+  note?: string
+  children: React.ReactNode
+}
+
+function SlotWrap({ showBadge, source, module, state, note, children }: SlotWrapProps) {
+  if (!showBadge) return <>{children}</>
+  return (
+    <IntegrationSlot source={source} module={module} state={state} note={note}>
+      {children}
+    </IntegrationSlot>
+  )
+}
+
 /**
  * 모든 시장이 동일하게 사용하는 트레이딩 뷰.
  *
  * - 데스크탑(lg+): HtsLayout (사이드바 + 차트 + 호가 + 주문 + 하단 dock, 모두 resizable)
  * - 모바일/태블릿: 기존 TradingLayout (세로 스택)
+ * - Layout flags: `resolveEffectiveLayoutFlags` via `useEffectiveLayoutFlags` (UI guards only)
  */
 export function UniversalMarketView({ marketId, onMarketChange, mobileHeaderSlot }: Props) {
   useMarketSubscription(marketId)
+
+  const layoutFlags = useEffectiveLayoutFlags()
+  const bannerCopy = useMemo(() => getLayoutModeBannerCopy(layoutFlags), [layoutFlags])
+  const showSpeedOrderSlot = shouldShowIntegrationSlot(layoutFlags, 'speedOrderChrome')
+  const showChromeSidebar = shouldShowChromeSidebar(layoutFlags)
+  const showBottomDock = shouldShowBottomDock(layoutFlags)
+  const orderReadOnly = isOrderPanelReadOnly(layoutFlags)
 
   const board = useTradingStore((s) => s.boards[marketId])
 
@@ -46,66 +83,91 @@ export function UniversalMarketView({ marketId, onMarketChange, mobileHeaderSlot
   const activeTicker = board.tickers.find((t) => t.symbol === board.activeSymbol)
   const changePct = activeTicker?.changePct ?? 0
 
+  const orderPanel = (
+    <OrderPanel
+      key={`${marketId}:${board.activeSymbol}`}
+      marketId={marketId}
+      spec={activeSpec}
+      lastPrice={board.lastPrice}
+      readOnly={orderReadOnly}
+    />
+  )
+
   return (
     <>
       <div className="hidden h-full min-h-0 lg:flex lg:flex-col">
-        <HtsLayout
-          sidebar={<MarketSidebar activeMarket={marketId} onMarketChange={onMarketChange} />}
-          chart={
-            <IntegrationSlot
-              source="05-SpeedOrder"
-              module="ChartArea + DOM"
-              state="in-progress"
-              note="TradingView 위젯 임시 사용 — 5번 차트 모듈로 교체 예정"
-            >
-              <TradingViewChart spec={activeSpec} lastPrice={board.lastPrice} changePct={changePct} />
-            </IntegrationSlot>
-          }
-          orderBook={
-            <IntegrationSlot
-              source="05-SpeedOrder"
-              module="OrderBookPanel (HTS)"
-              state="planned"
-              note="현재 mock 호가. 5번 HTS 호가창으로 교체 예정"
-            >
-              <OrderBookPanel book={board.orderBook} spec={activeSpec} lastPrice={board.lastPrice} />
-            </IntegrationSlot>
-          }
-          orderPanel={
-            <IntegrationSlot
-              source="05-SpeedOrder"
-              module="SpeedOrderPanel + StopMit"
-              state="planned"
-              note="현재 카테고리 config 기반 mock. 5번 거래 엔진 통합 예정"
-            >
-              <OrderPanel
-                key={`${marketId}:${board.activeSymbol}`}
-                marketId={marketId}
-                spec={activeSpec}
-                lastPrice={board.lastPrice}
-              />
-            </IntegrationSlot>
-          }
-          dock={
-            <IntegrationSlot
-              source="05-SpeedOrder"
-              module="PositionPanel + TradeHistoryPanel"
-              state="planned"
-              note="포지션·체결 표는 5번 패널로 교체 예정"
-            >
-              <BottomDock
-                marketId={marketId}
-                symbols={board.symbols}
-                positions={board.positions}
-                orders={board.orders}
-                fills={board.fills}
-              />
-            </IntegrationSlot>
-          }
-        />
+        <LayoutModeBanner copy={bannerCopy} />
+        <div className="min-h-0 flex-1">
+          <HtsLayout
+            showSidebar={showChromeSidebar}
+            showDock={showBottomDock}
+            sidebar={
+              showChromeSidebar ? (
+                <MarketSidebar activeMarket={marketId} onMarketChange={onMarketChange} />
+              ) : (
+                <LayoutSidebarPlaceholder />
+              )
+            }
+            chart={
+              <SlotWrap
+                showBadge={showSpeedOrderSlot}
+                source="05-SpeedOrder"
+                module="ChartArea + DOM"
+                state="in-progress"
+                note="TradingView 위젯 임시 사용 — 5번 차트 모듈로 교체 예정"
+              >
+                <TradingViewChart spec={activeSpec} lastPrice={board.lastPrice} changePct={changePct} />
+              </SlotWrap>
+            }
+            orderBook={
+              <SlotWrap
+                showBadge={showSpeedOrderSlot}
+                source="05-SpeedOrder"
+                module="OrderBookPanel (HTS)"
+                state="planned"
+                note="현재 mock 호가. 5번 HTS 호가창으로 교체 예정"
+              >
+                <OrderBookPanel book={board.orderBook} spec={activeSpec} lastPrice={board.lastPrice} />
+              </SlotWrap>
+            }
+            orderPanel={
+              <SlotWrap
+                showBadge={showSpeedOrderSlot}
+                source="05-SpeedOrder"
+                module="SpeedOrderPanel + StopMit"
+                state="planned"
+                note="현재 카테고리 config 기반 mock. 5번 거래 엔진 통합 예정"
+              >
+                {orderPanel}
+              </SlotWrap>
+            }
+            dock={
+              showBottomDock ? (
+                <SlotWrap
+                  showBadge={showSpeedOrderSlot}
+                  source="05-SpeedOrder"
+                  module="PositionPanel + TradeHistoryPanel"
+                  state="planned"
+                  note="포지션·체결 표는 5번 패널로 교체 예정"
+                >
+                  <BottomDock
+                    marketId={marketId}
+                    symbols={board.symbols}
+                    positions={board.positions}
+                    orders={board.orders}
+                    fills={board.fills}
+                  />
+                </SlotWrap>
+              ) : (
+                <LayoutDockPlaceholder />
+              )
+            }
+          />
+        </div>
       </div>
 
       <div className="flex h-full min-h-0 flex-col lg:hidden">
+        <LayoutModeBanner copy={bannerCopy} />
         {mobileHeaderSlot ? (
           <div className="shrink-0 border-b border-so-border bg-so-surface px-3 py-1.5">
             {mobileHeaderSlot}
@@ -126,14 +188,7 @@ export function UniversalMarketView({ marketId, onMarketChange, mobileHeaderSlot
           orderBook={
             <OrderBookPanel book={board.orderBook} spec={activeSpec} lastPrice={board.lastPrice} />
           }
-          orderPanel={
-            <OrderPanel
-              key={`${marketId}:${board.activeSymbol}`}
-              marketId={marketId}
-              spec={activeSpec}
-              lastPrice={board.lastPrice}
-            />
-          }
+          orderPanel={orderPanel}
           history={
             <HistoryPanel
               fills={board.fills}

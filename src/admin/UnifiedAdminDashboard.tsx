@@ -15,8 +15,30 @@ import { AdminNotificationCenter } from './AdminNotificationCenter'
 import { AdminPermissionSummaryCard } from './AdminPermissionSummaryCard'
 import { AdminRiskAlertList } from './AdminRiskAlertList'
 import { AdminSecurityStrip } from './AdminSecurityStrip'
+import { AdminSelfTestCenterPanel } from './AdminSelfTestCenterPanel'
 import { AdminSystemHealthPanel } from './AdminSystemHealthPanel'
 import { buildAdminRiskAlerts } from './buildAdminRiskAlerts'
+import {
+  shouldEnableGlobalDiagnosticsCenter,
+  shouldEnableIncidentReview,
+  shouldEnableProposalQueue,
+  shouldEnableOperationsTimeline,
+  shouldEnableRiskGraph,
+  shouldEnableWhitelabelPresets,
+  shouldEnableWhitelabelAdminConfig,
+  shouldEnableWhitelabelPreviewCenter,
+} from '../config/layoutUiGuards'
+import { useEffectiveLayoutFlags } from '../hooks/useEffectiveLayoutFlags'
+import { resolveWhitelabelShellClasses } from '../whitelabel/resolveWhitelabelClasses'
+import { TenantAdminConfigConsole } from '../whitelabel/admin/TenantAdminConfigConsole'
+import { TenantPreviewCenter } from '../whitelabel/preview/TenantPreviewCenter'
+import { useTenantWhitelabelStore } from '../whitelabel/tenantWhitelabelStore'
+import { GlobalDiagnosticsCenterPanel } from '../platform/globalDiagnostics/GlobalDiagnosticsCenterPanel'
+import { IncidentReviewBoard } from '../platform/incidentReview/IncidentReviewBoard'
+import { ProposalQueueBoard } from '../platform/proposalQueue/ProposalQueueBoard'
+import { OperationsTimelineBoard } from '../platform/operationsTimeline/OperationsTimelineBoard'
+import { CrossAppRiskGraphBoard } from '../platform/riskGraph/CrossAppRiskGraphBoard'
+import { useUnifiedEventStore } from '../platform/unifiedEventStore'
 
 let adminSessionHydrated = false
 
@@ -28,6 +50,19 @@ export function UnifiedAdminDashboard() {
   const role = useAdminAccessStore((s) => s.role)
   const auditLog = useAdminAccessStore((s) => s.auditLog)
   const log = useAdminAccessStore((s) => s.log)
+  const unifiedEvents = useUnifiedEventStore((s) => s.events)
+  const unifiedEventCount = unifiedEvents.length
+  const layoutFlags = useEffectiveLayoutFlags()
+  const showGlobalDiagnostics = shouldEnableGlobalDiagnosticsCenter(layoutFlags)
+  const showIncidentReview = shouldEnableIncidentReview(layoutFlags)
+  const showProposalQueue = shouldEnableProposalQueue(layoutFlags)
+  const showRiskGraph = shouldEnableRiskGraph(layoutFlags)
+  const showOperationsTimeline = shouldEnableOperationsTimeline(layoutFlags)
+  const whitelabelEnabled = shouldEnableWhitelabelPresets(layoutFlags)
+  const showWhitelabelPreview = shouldEnableWhitelabelPreviewCenter(layoutFlags)
+  const showWhitelabelAdminConfig = shouldEnableWhitelabelAdminConfig(layoutFlags)
+  const whitelabelPreset = useTenantWhitelabelStore((s) => s.preset)
+  const { adminShellClass } = resolveWhitelabelShellClasses(whitelabelPreset)
 
   const snapshots = useBridgeDashboardStore((s) => s.snapshots)
   const securityAdmin = useBridgeDashboardStore((s) => s.securityAdmin)
@@ -197,7 +232,10 @@ export function UnifiedAdminDashboard() {
   }, [goTradingNav, log])
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-auto bg-so-bg text-so-text">
+    <div
+      className={`flex min-h-0 flex-1 flex-col overflow-auto text-so-text ${whitelabelEnabled ? adminShellClass : 'bg-so-bg'}`}
+      data-ute-admin={whitelabelEnabled ? whitelabelPreset.admin : undefined}
+    >
       <header className="sticky top-0 z-10 border-b border-so-border bg-so-surface-2/95 px-3 py-2 backdrop-blur-md lg:px-4">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2">
           <div className="min-w-0">
@@ -257,6 +295,57 @@ export function UnifiedAdminDashboard() {
         <section aria-label="System health" className="space-y-2">
           <AdminSystemHealthPanel health={health} />
         </section>
+
+        <section aria-label="Self-test center" className="space-y-2">
+          <AdminSelfTestCenterPanel
+            bridgeErrorCount={bridgeAgg.errors}
+            auditEntryCount={auditLog.length}
+            unifiedEventCount={unifiedEventCount}
+            probeToken={lastProbeRunAt}
+          />
+        </section>
+
+        {showWhitelabelPreview ? (
+          <section aria-label="Tenant preview center" className="space-y-2">
+            <TenantPreviewCenter />
+          </section>
+        ) : null}
+
+        {showWhitelabelAdminConfig ? (
+          <section aria-label="Tenant admin config console" className="space-y-2">
+            <TenantAdminConfigConsole />
+          </section>
+        ) : null}
+
+        {showGlobalDiagnostics ? (
+          <section aria-label="Global diagnostics center" className="space-y-2">
+            <GlobalDiagnosticsCenterPanel bridgeErrorCount={bridgeAgg.errors} />
+          </section>
+        ) : null}
+
+        {showIncidentReview ? (
+          <section aria-label="AI incident review" className="space-y-2">
+            <IncidentReviewBoard unifiedEvents={unifiedEvents} />
+          </section>
+        ) : null}
+
+        {showProposalQueue ? (
+          <section aria-label="AI proposal queue" className="space-y-2">
+            <ProposalQueueBoard />
+          </section>
+        ) : null}
+
+        {showRiskGraph ? (
+          <section aria-label="Cross-app risk graph" className="space-y-2">
+            <CrossAppRiskGraphBoard bridgeErrorCount={bridgeAgg.errors} />
+          </section>
+        ) : null}
+
+        {showOperationsTimeline ? (
+          <section aria-label="Global operations timeline" className="space-y-2">
+            <OperationsTimelineBoard bridgeErrorCount={bridgeAgg.errors} />
+          </section>
+        ) : null}
 
         <section aria-label="Notifications" className="space-y-2">
           <AdminNotificationCenter items={notifications} />

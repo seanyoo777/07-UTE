@@ -58,5 +58,6 @@ Mobile layouts must work **fully offline** with mock adapters — no dependency 
 ## Related documents
 
 - `docs/UTE_ARCHITECTURE.md` — Where layout sits in the stack.  
+- `docs/UNIVERSAL_TRADING_UI_CONTRACT.md` — PWA 우선·공통 UI 계약 (§3 레이아웃, §11 PWA).  
 - `docs/MULTI_MARKET_RULES.md` — Shared row types feeding history on all breakpoints.  
 - `docs/MARKET_INTEGRATION.md` — Adding a market without breaking responsive grids.

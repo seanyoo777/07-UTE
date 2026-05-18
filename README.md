@@ -125,9 +125,11 @@ src/
 
 ## 실행
 
+**개발 서버 (고정 포트):** [http://localhost:5107](http://localhost:5107) — 프로젝트 번호 `07` → `5107`. `strictPort: true` (다른 포트로 자동 fallback 없음).
+
 ```bash
 npm install
-npm run dev      # 개발 서버
+npm run dev      # http://localhost:5107
 npm run build    # tsc -b && vite build
 npm run lint     # eslint
 ```

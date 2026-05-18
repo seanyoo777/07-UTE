@@ -8,6 +8,9 @@ This manual is the **human-facing index** for the repository. It complements `AG
 
 - **07-UTE** is a unified **mock / demo** trading shell: multi-market dashboard, HTS-style layout, no live broker connectivity in the default path.
 - **Do not** connect real trading APIs, **do not** execute real orders, **do not** execute real transfers or settlement, **do not** execute real tournament rewards or prize payouts from this codebase’s defaults, and **do not** remove existing user-facing features without explicit approval (`AGENTS.md`, `.cursorrules`).
+- **Environment:** use **`.env.example`** as the committed template only; put machine-specific values in **`.env.local`** (gitignored) — **never commit** `.env.local` or `.env.*.local`.
+- **Local dev:** `npm run dev` → **http://localhost:5107** (`vite.config.ts`, `strictPort: true`, project `07` — no port fallback).
+- **Self-test / validation:** follow **`docs/GLOBAL_SELF_TEST_VALIDATION.md`** — `/admin` includes **Self-Test Center** (PASS/WARN/FAIL, mock only) plus System Health & append-only audit.
 
 ---
 
@@ -16,6 +19,7 @@ This manual is the **human-facing index** for the repository. It complements `AG
 | Area | Path |
 |------|------|
 | App entry + `/admin` shell | `src/main.tsx`, `src/App.tsx`, `src/appNavigation.ts` |
+| **Platform shell** (tenant header · sidebar · workspace) | `src/platform/UtePlatformShell.tsx` — see `docs/UTE_PLATFORM_SHELL.md` |
 | HTS top bar + **BRG** + **ADM** | `src/shell/HtsTopBar.tsx` |
 | 통합 관리자 대시보드 (mock 읽기 전용) | `src/admin/` (`UnifiedAdminDashboard.tsx`, …) |
 | Mock admin RBAC · 감사·알림·헬스·export 마스킹 | `src/admin/adminAccess*.ts`, `adminAuditLog.ts`, `adminNotificationTypes.ts`, `adminSystemHealth.ts`, `adminSnapshotExport.ts` |
@@ -72,6 +76,20 @@ UTE separates **(A) on-screen trading** via `BrokerAdapter` from **(B) optional 
 - `docs/ONEAI_BRIDGE.md`, `docs/TGX_VENDOR_SYNC.md` — Partner notes + file pointers.  
 - `docs/MULTI_MARKET_RULES.md` — Rules + MockInvest / SpeedOrder / TetherGet bridge notes.  
 - `docs/MOBILE_TRADING_SYSTEM.md` — Responsive layout.  
+- `docs/UNIVERSAL_TRADING_UI_CONTRACT.md` — **기획 1단계:** 공통 호가·레이아웃·USD/KRW·배지·주문창·HTS/화이트라벨·feature flag·OneAI·**PWA 우선**·(자동매매·실거래·WS 구현 금지) UI 계약.  
+- `docs/GLOBAL_SELF_TEST_VALIDATION.md` — 공통 self-test·diagnostics·audit·smoke 원칙.  
+- `docs/UTE_LAYOUT_FEATURE_FLAGS.md` — 레이아웃 feature flag 계약·구현; env 목록은 **`.env.example`** (공개 템플릿). **`.env.local` / `.env.*.local`은 커밋 금지** (`.gitignore`).  
+- `docs/UTE_PLATFORM_SHELL.md` — 공통 Platform Shell MVP (tenant chrome, diagnostics entry, mockOnly).
+- `docs/UTE_DIAGNOSTICS_UI_WIRING.md` — PlatformDiagnosticsPanel `@tetherget/diagnostics-ui` view-model (PHASE35).  
+- `docs/UTE_GLOBAL_DIAGNOSTICS_CENTER.md` — Cross-app Global Diagnostics Center mock draft on `/admin` (PHASE36).  
+- `docs/UTE_INCIDENT_REVIEW.md` — AI Incident Review mock board (triage, no auto-remediation, PHASE37).  
+- `docs/UTE_PROPOSAL_QUEUE.md` — AI Proposal Queue mock (status-only review, PHASE38).  
+- `docs/UTE_RISK_GRAPH.md` — Cross-App Risk Graph mock (PHASE39).  
+- `docs/UTE_OPERATIONS_TIMELINE.md` — Global Operations Timeline mock (PHASE40).  
+- `docs/UTE_WHITELABEL_THEME.md` — White-label theme preset engine (mock tenants, localStorage switcher).  
+- `docs/UTE_UNIFIED_EVENT_FEED.md` — Unified Event Feed (mock sources, localStorage max 10, feature flag).  
+- `docs/UTE_WORKSPACE_CONTEXT_ROUTER.md` — Workspace context router (feed → panel highlight, tenant scope).  
+- `docs/UTE_TENANT_CONTEXT_BRIDGE.md` — 12-TGX-TokenAdmin validation bridge (read-only, scope mismatch).  
 - `docs/SECURITY_ADMIN_STRUCTURE.md` — Mock security/admin bundle + unified admin dashboard.  
 
 ---

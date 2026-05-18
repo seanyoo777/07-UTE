@@ -11,6 +11,8 @@ type Props = {
   marketId: MarketId
   spec: SymbolSpec | undefined
   lastPrice: number
+  /** UI guard only — does not change store / submitOrder contract. */
+  readOnly?: boolean
 }
 
 const ORDER_TYPE_LABEL: Record<OrderTypeOption, string> = {
@@ -27,7 +29,7 @@ const ORDER_TYPE_LABEL: Record<OrderTypeOption, string> = {
  * - 카테고리별 차이는 CategoryConfig 로만 표현 (orderTypes / sides 라벨 / leverage / SLTP 등)
  * - submitOrder 어댑터 호출은 그대로 (UI는 어댑터를 모른다)
  */
-export function OrderPanel({ marketId, spec, lastPrice }: Props) {
+export function OrderPanel({ marketId, spec, lastPrice, readOnly = false }: Props) {
   const config = getCategoryConfig(marketId)
   const submitOrder = useTradingStore((s) => s.submitOrder)
 
@@ -69,6 +71,7 @@ export function OrderPanel({ marketId, spec, lastPrice }: Props) {
   }, [notional, leverage, config.showLeverageSelector])
 
   async function onSubmit(): Promise<void> {
+    if (readOnly) return
     if (!spec) return
     const quantity = Number(qty) || 0
     if (quantity <= 0) {
@@ -111,21 +114,30 @@ export function OrderPanel({ marketId, spec, lastPrice }: Props) {
     }
   }
 
+  const inputsDisabled = readOnly || busy
+
   return (
     <PanelShell title={config.label + ' 주문'} scrollBody>
       <div className="flex flex-col gap-3 p-3 text-[12px]">
+        {readOnly ? (
+          <p className="rounded-md border border-so-accent/30 bg-so-accent/10 px-2 py-1 text-[10px] text-so-accent">
+            Demo · read-only — 주문 입력·제출 비활성 (mock UI guard)
+          </p>
+        ) : null}
         <div className="grid grid-cols-2 gap-1 rounded-md bg-so-surface-2 p-1">
           <SideTab
             active={side === 'buy'}
             tone={config.sides.buyAccent}
             onClick={() => setSide('buy')}
             label={config.sides.buy}
+            disabled={inputsDisabled}
           />
           <SideTab
             active={side === 'sell'}
             tone={config.sides.sellAccent}
             onClick={() => setSide('sell')}
             label={config.sides.sell}
+            disabled={inputsDisabled}
           />
         </div>
 
@@ -135,9 +147,10 @@ export function OrderPanel({ marketId, spec, lastPrice }: Props) {
               <button
                 key={t}
                 type="button"
+                disabled={inputsDisabled}
                 onClick={() => setOrderType(t)}
                 className={[
-                  'rounded px-2 py-1 transition-colors',
+                  'rounded px-2 py-1 transition-colors disabled:cursor-not-allowed disabled:opacity-50',
                   orderType === t ? 'bg-so-surface-2 text-so-text' : 'hover:text-so-text',
                 ].join(' ')}
               >
@@ -154,6 +167,7 @@ export function OrderPanel({ marketId, spec, lastPrice }: Props) {
             value={price}
             placeholder={formatPrice(lastPrice, spec.priceDecimals)}
             onChange={setPrice}
+            disabled={inputsDisabled}
           />
         ) : null}
 
@@ -164,6 +178,7 @@ export function OrderPanel({ marketId, spec, lastPrice }: Props) {
             value={stopLoss}
             placeholder={spec ? formatPrice(lastPrice, spec.priceDecimals) : ''}
             onChange={setStopLoss}
+            disabled={inputsDisabled}
           />
         ) : null}
 
@@ -173,6 +188,7 @@ export function OrderPanel({ marketId, spec, lastPrice }: Props) {
           value={qty}
           placeholder={spec ? `min ${spec.minQty}` : ''}
           onChange={setQty}
+          disabled={inputsDisabled}
         />
 
         {config.showLeverageSelector ? (
@@ -180,6 +196,7 @@ export function OrderPanel({ marketId, spec, lastPrice }: Props) {
             value={leverage}
             max={Math.max(1, spec?.defaultLeverage ?? 1) * 5}
             onChange={setLeverage}
+            disabled={inputsDisabled}
           />
         ) : null}
 
@@ -189,13 +206,26 @@ export function OrderPanel({ marketId, spec, lastPrice }: Props) {
             hint="롱/숏 동시 보유"
             value={hedge}
             onChange={setHedge}
+            disabled={inputsDisabled}
           />
         ) : null}
 
         {config.showStopLossTakeProfit ? (
           <div className="grid grid-cols-2 gap-2">
-            <Field label="손절" value={stopLoss} onChange={setStopLoss} placeholder="옵션" />
-            <Field label="익절" value={takeProfit} onChange={setTakeProfit} placeholder="옵션" />
+            <Field
+              label="손절"
+              value={stopLoss}
+              onChange={setStopLoss}
+              placeholder="옵션"
+              disabled={inputsDisabled}
+            />
+            <Field
+              label="익절"
+              value={takeProfit}
+              onChange={setTakeProfit}
+              placeholder="옵션"
+              disabled={inputsDisabled}
+            />
           </div>
         ) : null}
 
@@ -207,9 +237,10 @@ export function OrderPanel({ marketId, spec, lastPrice }: Props) {
                 <button
                   key={sec}
                   type="button"
+                  disabled={inputsDisabled}
                   onClick={() => setBinaryExpirySec(sec)}
                   className={[
-                    'rounded-md border px-1 py-1 text-[11px] font-semibold transition-colors',
+                    'rounded-md border px-1 py-1 text-[11px] font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50',
                     binaryExpirySec === sec
                       ? 'border-so-accent bg-so-accent/15 text-so-text'
                       : 'border-so-border text-so-muted hover:text-so-text',
@@ -246,7 +277,7 @@ export function OrderPanel({ marketId, spec, lastPrice }: Props) {
         <button
           type="button"
           onClick={onSubmit}
-          disabled={busy || !spec}
+          disabled={inputsDisabled || !spec}
           className={[
             'mt-1 rounded-md px-3 py-2 text-[13px] font-semibold text-white transition-colors disabled:opacity-50',
             side === 'buy'
@@ -273,12 +304,20 @@ export function OrderPanel({ marketId, spec, lastPrice }: Props) {
   )
 }
 
-function SideTab(props: { active: boolean; tone: 'bid' | 'ask'; onClick: () => void; label: string }) {
+function SideTab(props: {
+  active: boolean
+  tone: 'bid' | 'ask'
+  onClick: () => void
+  label: string
+  disabled?: boolean
+}) {
   return (
     <button
       type="button"
+      disabled={props.disabled}
       onClick={props.onClick}
       className={[
+        'disabled:cursor-not-allowed disabled:opacity-50',
         'rounded-md px-2 py-1.5 text-[12px] font-semibold transition-colors',
         props.active
           ? props.tone === 'bid'
@@ -298,6 +337,7 @@ function Field(props: {
   onChange: (v: string) => void
   placeholder?: string
   suffix?: string
+  disabled?: boolean
 }) {
   return (
     <label className="flex flex-col gap-1">
@@ -305,6 +345,7 @@ function Field(props: {
       <div className="flex items-center rounded-md border border-so-border bg-so-surface-2 px-2 py-1.5">
         <input
           inputMode="decimal"
+          disabled={props.disabled}
           value={props.value}
           placeholder={props.placeholder}
           onChange={(e) => props.onChange(e.target.value)}
@@ -318,7 +359,12 @@ function Field(props: {
   )
 }
 
-function LeverageRow(props: { value: number; max: number; onChange: (n: number) => void }) {
+function LeverageRow(props: {
+  value: number
+  max: number
+  onChange: (n: number) => void
+  disabled?: boolean
+}) {
   return (
     <label className="flex flex-col gap-1">
       <span className="flex items-center justify-between text-[11px] text-so-muted">
@@ -330,6 +376,7 @@ function LeverageRow(props: { value: number; max: number; onChange: (n: number) 
         min={1}
         max={Math.max(1, props.max)}
         step={1}
+        disabled={props.disabled}
         value={props.value}
         onChange={(e) => props.onChange(Number(e.target.value))}
         className="accent-so-accent"
@@ -343,12 +390,14 @@ function Toggle(props: {
   hint: string
   value: boolean
   onChange: (v: boolean) => void
+  disabled?: boolean
 }) {
   return (
     <button
       type="button"
+      disabled={props.disabled}
       onClick={() => props.onChange(!props.value)}
-      className="flex items-center justify-between rounded-md border border-so-border bg-so-surface-2 px-2 py-1.5 text-left text-[12px]"
+      className="flex items-center justify-between rounded-md border border-so-border bg-so-surface-2 px-2 py-1.5 text-left text-[12px] disabled:cursor-not-allowed disabled:opacity-50"
     >
       <span className="flex flex-col">
         <span className="text-so-text">{props.label}</span>

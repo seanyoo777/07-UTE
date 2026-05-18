@@ -47,7 +47,7 @@ export function HtsTopBar({ marketId, status }: Props) {
 
   return (
     <>
-      <header className="relative flex shrink-0 items-center gap-2 border-b border-so-border bg-gradient-to-b from-so-surface-2 via-so-surface to-so-surface px-2 py-1.5 backdrop-blur-md lg:px-3 lg:py-2">
+      <header className="relative flex shrink-0 items-center gap-2 border-b border-so-border-2/70 bg-gradient-to-b from-[#121822] via-so-surface-2 to-so-surface px-2 py-1.5 shadow-[0_1px_0_rgba(79,135,255,0.1)] backdrop-blur-md lg:px-3 lg:py-2">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-so-accent/30 to-transparent" />
 
       <div className="flex shrink-0 items-center gap-2">

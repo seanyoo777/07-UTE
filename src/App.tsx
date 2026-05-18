@@ -3,8 +3,11 @@ import { UnifiedAdminDashboard } from './admin'
 import { useAppNavigation } from './appNavigation'
 import { ErrorBoundary } from './components/common/ErrorBoundary'
 import type { MarketId } from './markets/types'
+import { shouldShowHtsTopBar, shouldShowPremiumShell } from './config/layoutUiGuards'
+import { useEffectiveLayoutFlags } from './hooks/useEffectiveLayoutFlags'
+import { UtePlatformShell } from './platform/UtePlatformShell'
 import { HtsTopBar } from './shell/HtsTopBar'
-import { MarketTabs } from './shell/MarketTabs'
+import { UtePremiumTradingShell } from './shell/UtePremiumTradingShell'
 import { useTradingStore } from './store/tradingStore'
 
 const KrStockView = lazy(() =>
@@ -55,8 +58,7 @@ function AppFallback() {
 /**
  * HTS 전체 셸:
  *  - 상단: HtsTopBar (OneAI · 뉴스 · 시스템트레이딩 · 시장상태 · 어댑터상태)
- *  - 모바일에서만: MarketTabs (가로 스크롤) — 데스크탑은 좌측 사이드바가 대체
- *  - 본문: 활성 시장 View
+ *  - 본문: UtePremiumTradingShell — 시장 탭(전 구간) + 데스크탑 사이드 mock 패널 + 기존 View
  */
 export default function App() {
   const view = useAppNavigation((s) => s.view)
@@ -64,6 +66,9 @@ export default function App() {
   const activeMarketId = useTradingStore((s) => s.activeMarketId)
   const setActiveMarket = useTradingStore((s) => s.setActiveMarket)
   const status = useTradingStore((s) => s.boards[activeMarketId].status)
+  const layoutFlags = useEffectiveLayoutFlags()
+  const showTopBar = shouldShowHtsTopBar(layoutFlags)
+  const showPremiumShell = shouldShowPremiumShell(layoutFlags)
 
   useEffect(() => {
     syncFromWindow()
@@ -84,9 +89,11 @@ export default function App() {
           </div>
         }
       >
-        <div className="flex min-h-screen min-h-[100dvh] flex-col">
-          <UnifiedAdminDashboard />
-        </div>
+        <UtePlatformShell>
+          <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+            <UnifiedAdminDashboard />
+          </div>
+        </UtePlatformShell>
       </ErrorBoundary>
     )
   }
@@ -99,17 +106,24 @@ export default function App() {
         </div>
       }
     >
-      <div className="flex h-full min-h-0 flex-col">
-        <HtsTopBar marketId={activeMarketId} status={status} />
-        <div className="lg:hidden">
-          <MarketTabs active={activeMarketId} onChange={setActiveMarket} />
+      <UtePlatformShell activeMarketId={activeMarketId} adapterStatus={status}>
+        <div className="flex h-full min-h-0 flex-col">
+          {showTopBar ? <HtsTopBar marketId={activeMarketId} status={status} /> : null}
+          <main className="flex min-h-0 flex-1 flex-col overflow-hidden bg-so-bg">
+            {showPremiumShell ? (
+              <UtePremiumTradingShell activeMarketId={activeMarketId} onMarketChange={setActiveMarket}>
+                <Suspense fallback={<AppFallback />}>
+                  <ViewFor marketId={activeMarketId} onMarketChange={setActiveMarket} />
+                </Suspense>
+              </UtePremiumTradingShell>
+            ) : (
+              <Suspense fallback={<AppFallback />}>
+                <ViewFor marketId={activeMarketId} onMarketChange={setActiveMarket} />
+              </Suspense>
+            )}
+          </main>
         </div>
-        <main className="flex min-h-0 flex-1 flex-col">
-          <Suspense fallback={<AppFallback />}>
-            <ViewFor marketId={activeMarketId} onMarketChange={setActiveMarket} />
-          </Suspense>
-        </main>
-      </div>
+      </UtePlatformShell>
     </ErrorBoundary>
   )
 }

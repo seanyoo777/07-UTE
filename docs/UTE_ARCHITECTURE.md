@@ -19,7 +19,7 @@
 
 ## Layered model
 
-1. **Presentation** — React components, shells (`AppShell`, `HtsLayout`), market views under `src/markets/views/`, panels (chart, order book, order form, history).
+1. **Presentation** — React components, shells (`AppShell`, **`UtePremiumTradingShell`**, `HtsLayout`), market views under `src/markets/views/`, panels (chart, order book, order form, history).
 2. **Application state** — Zustand store (`src/store/tradingStore.ts`) holds per-market **boards** (active symbol, tickers, order book snapshot, orders, fills, positions).
 3. **Domain** — Shared types in `src/core/domain/` (`trading.ts`, `order.ts`) and symbol contracts in `src/core/symbols/SymbolSpec.ts`.
 4. **Integration boundary** — **`BrokerAdapter`** (`src/core/adapters/BrokerAdapter.ts`) is the only contract the store uses for connect, subscribe, and place/cancel orders.
@@ -68,8 +68,26 @@ Order submission follows the same boundary: **`submitOrder` → adapter.placeOrd
 - `docs/MULTI_MARKET_RULES.md` — Session, symbol, and PnL rules across markets.  
 - `docs/ONEAI_BRIDGE.md`, `docs/TGX_VENDOR_SYNC.md` — Partner alignment.  
 - `docs/MOBILE_TRADING_SYSTEM.md` — Responsive layout and touch-first patterns.  
+- `docs/UNIVERSAL_TRADING_UI_CONTRACT.md` — 공통 거래 UI 상태·레이아웃·PWA 우선 정책 (기획 계약).  
+- `docs/UTE_LAYOUT_FEATURE_FLAGS.md` — 레이아웃 preset·feature flag·graceful fallback (기획 2단계).  
 - `docs/SECURITY_ADMIN_STRUCTURE.md` — Mock security/admin posture types and BRG strip.  
 - `MASTER_MANUAL.md` — Operator-facing index including `src/bridges/` layout.
+
+---
+
+## Premium trading shell (phase 1)
+
+UTE 메인 트레이딩 경로(`/`)는 **mock-only 통합 셸**을 한 겹 더 둡니다. 목적은 Linear/Vercel/HTS 톤의 **프리미엄 대시보드 레이아웃**(topbar + 시장 탭 + 데스크탑 사이드 mock 카드 + 본문 카드 프레임)이며, **주문·체결 로직·어댑터 계약은 변경하지 않습니다**.
+
+| Piece | Location | Notes |
+|-------|-----------|--------|
+| Top bar | `src/shell/HtsTopBar.tsx` | 기존 BRG/ADM·상태 배지 유지; 시각적 border/glow만 보강 가능 |
+| Shell layout | `src/shell/UtePremiumTradingShell.tsx` | `activeMarketId` / `setActiveMarket`만 연결; `children` = 기존 `ViewFor` → `UniversalMarketView` 트리 |
+| 시장 탭 라벨 | `src/shell/utePremiumShellConfig.ts` | Crypto / US Stocks / Futures / FX / Index 표시명; 각 항목은 기존 `MarketId` 하나에 매핑 (FX→`kr-futures`, Index→`kr-stock` 등 **라벨 전용**) |
+| Mock 사이드 패널 | `UtePremiumTradingShell` + `UteShellPlaceholderCard` | `useTradingStore`의 활성 보드 **스냅샷**만 표시 (bid/ask level 수, 포지션 수, Σ uPnL); 실시간 API 없음 |
+| Chart / Order placeholder | 셸 내부 스트립 + 본문 | 실제 차트·주문 패널은 **기존** `HtsLayout` / `OrderPanel` 등에 그대로 존재; 셸은 안내용 placeholder 한 줄 추가 |
+
+반응형: **lg 미만**에서는 좌측 사이드바를 숨기고 시장 탭은 **가로 스크롤**로 유지하여 모바일에서도 시장 전환이 가능합니다.
 
 ---
 

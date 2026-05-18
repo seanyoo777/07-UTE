@@ -15,6 +15,18 @@ Current Role:
 
 ---
 
+## GLOBAL SELF-TEST & VALIDATION
+
+All work must follow **`docs/GLOBAL_SELF_TEST_VALIDATION.md`**:
+
+- Self-Test Center, Diagnostics Panel, append-only mock Audit Trail, feature-flag checks, documented smoke (`test` / `lint` / `build`).
+- Verdicts: **PASS / WARN / FAIL**; show **issue count**, **last checked**, **mock only** on diagnostics UI.
+- **Additive only** — no live execution, settlement, on-chain, or uncontrolled realtime loops.
+
+07-UTE: `runUteSelfTestSuite()`, `AdminSelfTestCenterPanel` on `/admin`.
+
+---
+
 ## CORE RULES
 
 - Do NOT remove existing features

@@ -17,8 +17,8 @@
 | Trading state | `src/store/tradingStore.ts`, `boot.ts` | Per-market **boards** (symbol list, tickers, book, orders, positions) |
 | Adapters | `src/adapters/*.ts`, `index.ts` | **`BrokerAdapter`** mock implementations per market |
 | Core | `src/core/domain/*`, `BrokerAdapter.ts`, `engine/*`, `symbols/*`, `utils/*`, `fx/*` | Domain types, mock engines, PnL/FX helpers |
-| UI — trading | `src/components/chart/*`, `orderbook/*`, `order/*`, `ticker/*`, `dock/*`, `history/*`, `layouts/*` | HTS-style panels; **`HtsLayout`** (lg+) + **`TradingLayout`** (mobile) |
-| Shell | `src/shell/HtsTopBar.tsx`, `MarketTabs.tsx` | BRG/ADM, status badges |
+| UI — trading | `src/components/chart/*`, `orderbook/*`, `order/*`, `ticker/*`, `dock/*`, `history/*`, `layouts/*` | HTS-style panels; **`HtsLayout`** (lg+) + **`TradingLayout`** (mobile); 계약 요약 `docs/UNIVERSAL_TRADING_UI_CONTRACT.md` |
+| Shell | `src/shell/HtsTopBar.tsx`, **`UtePremiumTradingShell.tsx`**, `utePremiumShellConfig.ts`, `MarketTabs.tsx` (레거시/AppShell), `components/shell/UteShellPlaceholderCard.tsx` | BRG/ADM, premium 시장 탭·사이드 mock 패널; 레이아웃 flag 계약 `docs/UTE_LAYOUT_FEATURE_FLAGS.md` |
 | Config | `src/config/categoryConfig.ts`, `proLayout.ts` | Per-`MarketId` UI hints, layout limits |
 | CEX-shaped mock | `src/cex/*` | **UTE-owned** types + mock feed aligned with **02 TGX-CEX contract** (naming only) |
 | Vendor-shaped mock | `src/vendor/*` | **UTE-owned** mock aligned with **05 SpeedOrder contract** — UTE edits **this repo’s** `src/vendor` only; do **not** change the external 05 product repo |
@@ -32,7 +32,7 @@
 
 ## 2. Routing structure
 
-- **Trading (default):** `pathname` `/` → `App` renders `HtsTopBar` + `MarketTabs` (mobile) + `ViewFor(marketId)` lazy market views.
+- **Trading (default):** `pathname` `/` → `App` renders `HtsTopBar` + **`UtePremiumTradingShell`** (시장 탭 전 구간 + lg+ 사이드바 mock 요약) + `ViewFor(marketId)` lazy market views. **`MarketTabs`**는 `AppShell` 등 보조 셸에서만 사용(메인 트레이딩은 셸 탭으로 통합).
 - **Admin:** `pathname` `/admin` → `UnifiedAdminDashboard` (no `HtsTopBar`; own header).
 - **Sync:** `useAppNavigation.syncFromWindow()` on mount + `popstate` (browser back/forward).
 

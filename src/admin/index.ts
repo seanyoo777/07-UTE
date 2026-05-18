@@ -29,3 +29,6 @@ export { ADMIN_ROLE_DISPLAY, getCapabilitiesForRole, getPermissionsForRole, buil
 export { useAdminAccessStore, INITIAL_MOCK_ADMIN_ROLE } from './adminAccessStore'
 export { createAdminAuditLogEntry, buildMockAdminAuditSeed } from './adminAuditLog'
 export type { AdminAuditLogEntry, AdminAuditAction } from './adminAuditLog'
+export { runUteSelfTestSuite } from './selfTest/runUteSelfTestSuite'
+export type { SelfTestReport, SelfTestVerdict, SelfTestCheck } from './selfTest/uteSelfTestTypes'
+export { AdminSelfTestCenterPanel } from './AdminSelfTestCenterPanel'

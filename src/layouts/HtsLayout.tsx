@@ -9,6 +9,10 @@ type Props = {
   orderBook: ReactNode
   orderPanel: ReactNode
   dock: ReactNode
+  /** UI chrome — false hides market sidebar column + resize handle. */
+  showSidebar?: boolean
+  /** UI chrome — false hides bottom dock row + horizontal resize. */
+  showDock?: boolean
 }
 
 const DOCK_SPLITTER_PX = 6
@@ -21,7 +25,15 @@ const DOCK_SPLITTER_PX = 6
  *
  * 각 영역 폭/높이는 ResizeHandle 로 드래그 조절 + localStorage 영속.
  */
-export function HtsLayout({ sidebar, chart, orderBook, orderPanel, dock }: Props) {
+export function HtsLayout({
+  sidebar,
+  chart,
+  orderBook,
+  orderPanel,
+  dock,
+  showSidebar = true,
+  showDock = true,
+}: Props) {
   const layout = usePersistedProLayout()
   const mainRowRef = useRef<HTMLDivElement>(null)
 
@@ -47,18 +59,22 @@ export function HtsLayout({ sidebar, chart, orderBook, orderPanel, dock }: Props
         ref={mainRowRef}
         className="flex min-h-[360px] flex-1 flex-row overflow-hidden"
       >
-        <aside
-          style={{ width: layout.sidebarPx }}
-          className="flex min-h-0 shrink-0 flex-col overflow-hidden"
-        >
-          {sidebar}
-        </aside>
-        <ResizeHandle
-          orientation="vertical"
-          label="시장 사이드바 너비"
-          onDragDelta={layout.applySidebarDelta}
-          onDoubleClickReset={layout.resetSidebar}
-        />
+        {showSidebar ? (
+          <>
+            <aside
+              style={{ width: layout.sidebarPx }}
+              className="flex min-h-0 shrink-0 flex-col overflow-hidden"
+            >
+              {sidebar}
+            </aside>
+            <ResizeHandle
+              orientation="vertical"
+              label="시장 사이드바 너비"
+              onDragDelta={layout.applySidebarDelta}
+              onDoubleClickReset={layout.resetSidebar}
+            />
+          </>
+        ) : null}
 
         <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">{chart}</div>
 
@@ -91,19 +107,23 @@ export function HtsLayout({ sidebar, chart, orderBook, orderPanel, dock }: Props
         </aside>
       </div>
 
-      <ResizeHandle
-        orientation="horizontal"
-        label="포지션·체결 도크 높이"
-        onDragDelta={onDockDrag}
-        onDoubleClickReset={layout.resetDock}
-      />
+      {showDock ? (
+        <>
+          <ResizeHandle
+            orientation="horizontal"
+            label="포지션·체결 도크 높이"
+            onDragDelta={onDockDrag}
+            onDoubleClickReset={layout.resetDock}
+          />
 
-      <div
-        style={{ height: layout.dockPx }}
-        className="flex w-full min-h-0 shrink-0 flex-col overflow-hidden"
-      >
-        {dock}
-      </div>
+          <div
+            style={{ height: layout.dockPx }}
+            className="flex w-full min-h-0 shrink-0 flex-col overflow-hidden"
+          >
+            {dock}
+          </div>
+        </>
+      ) : null}
     </div>
   )
 }
